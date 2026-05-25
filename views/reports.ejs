@@ -1,0 +1,206 @@
+<%- include('partials/header') %>
+
+<div class="reports-container">
+    <!-- Encabezado de Reportes -->
+    <div class="reports-header">
+        <div class="reports-header-title">
+            <h2><i class="fa-solid fa-chart-line"></i> Reportes y Estadísticas</h2>
+            <div class="report-meta-tag">
+                <span>
+                    <i class="fa-solid fa-user-tie"></i> Generado por: 
+                    <strong><%= user.nombre %> <%= user.apellido %></strong> (<%= user.tipo_usuario %>)
+                </span>
+                <span>•</span>
+                <span>
+                    <i class="fa-solid fa-calendar-days"></i> Fecha: 
+                    <strong><%= new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></strong>
+                </span>
+            </div>
+        </div>
+        <div class="reports-actions-panel">
+            <a href="/dashboard" class="btn-report-action">
+                <i class="fa-solid fa-arrow-left"></i> Volver al Panel
+            </a>
+            <button onclick="window.print()" class="btn-report-action btn-accent">
+                <i class="fa-solid fa-file-pdf"></i> Guardar PDF / Imprimir
+            </button>
+        </div>
+    </div>
+
+    <!-- Grid de Indicadores Clave (Stats Summary) -->
+    <div class="stats-summary-grid">
+        <!-- Tarjeta 1: Total Alquileres -->
+        <div class="stat-card-premium">
+            <div class="stat-card-info">
+                <span class="stat-card-label">Total Alquileres</span>
+                <span class="stat-card-value"><%= summary.totalAlquileres %></span>
+                <span class="stat-card-accent">
+                    <i class="fa-solid fa-arrow-trend-up"></i> Histórico total
+                </span>
+            </div>
+            <div class="stat-card-icon">
+                <i class="fa-solid fa-ticket"></i>
+            </div>
+        </div>
+
+        <!-- Tarjeta 2: Alquileres Activos -->
+        <div class="stat-card-premium">
+            <div class="stat-card-info">
+                <span class="stat-card-label">Alquileres Activos</span>
+                <span class="stat-card-value"><%= summary.alquileresActivos %></span>
+                <span class="stat-card-accent">
+                    <i class="fa-solid fa-hourglass-half"></i> En posesión
+                </span>
+            </div>
+            <div class="stat-card-icon">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+        </div>
+
+        <!-- Tarjeta 3: Ingresos Totales -->
+        <div class="stat-card-premium">
+            <div class="stat-card-info">
+                <span class="stat-card-label">Ingresos Generados</span>
+                <span class="stat-card-value">$<%= Number(summary.totalIngresos).toFixed(2) %></span>
+                <span class="stat-card-accent" style="color: var(--color-gold);">
+                    <i class="fa-solid fa-circle-dollar-to-slot"></i> CineFlix Pay
+                </span>
+            </div>
+            <div class="stat-card-icon" style="color: var(--color-gold);">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+            </div>
+        </div>
+
+        <!-- Tarjeta 4: Clientes Registrados -->
+        <div class="stat-card-premium">
+            <div class="stat-card-info">
+                <span class="stat-card-label">Clientes Activos</span>
+                <span class="stat-card-value"><%= summary.totalClientes %></span>
+                <span class="stat-card-accent">
+                    <i class="fa-solid fa-user-check"></i> Usuarios registrados
+                </span>
+            </div>
+            <div class="stat-card-icon">
+                <i class="fa-solid fa-users"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Layout Principal de Reportes -->
+    <div class="reports-layout-grid">
+        <!-- Columna Izquierda: Ranking Películas más Vistas -->
+        <div class="report-section-card">
+            <h3 class="report-section-title">
+                <i class="fa-solid fa-trophy"></i> Películas Más Vistas (Top 10 Alquileres)
+            </h3>
+            
+            <% if (topMovies && topMovies.length > 0) { %>
+                <div class="ranking-list">
+                    <% topMovies.forEach((movie, index) => { %>
+                        <div class="ranking-item">
+                            <!-- Posición / Podio -->
+                            <div class="ranking-position <%= index === 0 ? 'rank-first' : (index === 1 ? 'rank-second' : (index === 2 ? 'rank-third' : 'rank-rest')) %>">
+                                <%= index + 1 %>
+                            </div>
+
+                            <!-- Poster Miniatura -->
+                            <div class="ranking-poster">
+                                <img src="<%= movie.imagen_url || 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=100&auto=format&fit=crop' %>" alt="<%= movie.titulo %>">
+                            </div>
+
+                            <!-- Detalles de Película -->
+                            <div class="ranking-details">
+                                <span class="ranking-movie-title"><%= movie.titulo %></span>
+                                <div class="ranking-movie-meta">
+                                    <span><i class="fa-solid fa-tag"></i> <%= movie.genero %></span>
+                                    <span><i class="fa-solid fa-user-ninja"></i> <%= movie.director %></span>
+                                    <span><i class="fa-solid fa-cubes"></i> Stock actual: <strong><%= movie.stock %></strong></span>
+                                </div>
+                            </div>
+
+                            <!-- Estadísticas de Alquiler -->
+                            <div class="ranking-stats">
+                                <div class="ranking-stat-block">
+                                    <span class="ranking-stat-label">Alquileres</span>
+                                    <span class="ranking-stat-count"><%= movie.total_alquileres %></span>
+                                </div>
+                                <div class="ranking-stat-block">
+                                    <span class="ranking-stat-label">Ingresos</span>
+                                    <span class="ranking-stat-income">$<%= Number(movie.ingresos_generados || 0).toFixed(2) %></span>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <p style="color: var(--text-muted); text-align: center; padding: 2rem 0;">
+                    No hay suficientes datos de alquiler registrados para generar un ranking.
+                </p>
+            <% } %>
+        </div>
+
+        <!-- Columna Derecha: Estadísticas por Género y Destacado -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Distribución por Géneros -->
+            <div class="report-section-card">
+                <h3 class="report-section-title">
+                    <i class="fa-solid fa-chart-pie"></i> Alquileres por Género
+                </h3>
+                
+                <% if (byGenre && byGenre.length > 0) { %>
+                    <div class="genre-chart-list">
+                        <% byGenre.forEach(genre => { 
+                            const percentage = summary.totalAlquileres > 0 
+                                ? ((genre.total_alquileres / summary.totalAlquileres) * 100).toFixed(1)
+                                : 0;
+                        %>
+                            <div class="genre-chart-item">
+                                <div class="genre-info-row">
+                                    <span class="genre-name">
+                                        <i class="fa-solid fa-film" style="font-size: 0.8rem; color: var(--color-gerente);"></i>
+                                        <%= genre.genero %>
+                                    </span>
+                                    <span class="genre-count">
+                                        <span><%= genre.total_alquileres %></span> rentas (<%= percentage %>%)
+                                    </span>
+                                </div>
+                                <div class="genre-bar-track">
+                                    <div class="genre-bar-fill" style="width: <%= percentage %>%"></div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <p style="color: var(--text-muted); text-align: center; padding: 1.5rem 0;">
+                        Sin información de géneros disponible.
+                    </p>
+                <% } %>
+            </div>
+
+            <!-- Película más Popular (Card Destacada) -->
+            <div class="report-section-card" style="border: 1px solid var(--color-gold-glow); overflow: hidden; position: relative;">
+                <div style="position: absolute; top: -10px; right: -10px; background: var(--color-gold); color: #08080a; padding: 15px 30px 10px 10px; transform: rotate(45deg); font-weight: bold; font-size: 0.75rem; letter-spacing: 1px;">
+                    ESTRELLA
+                </div>
+                <h3 class="report-section-title" style="color: var(--color-gold); border-color: var(--color-gold-glow);">
+                    <i class="fa-solid fa-star"></i> Película Más Solicitada
+                </h3>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; padding: 1rem 0;">
+                    <div style="font-size: 3.5rem; color: var(--color-gold); text-shadow: 0 0 20px var(--color-gold-glow);">
+                        <i class="fa-solid fa-film"></i>
+                    </div>
+                    <div>
+                        <h4 style="font-family: var(--font-body); font-size: 1.5rem; color: var(--text-main); margin-bottom: 0.5rem;">
+                            <%= summary.peliculaTop !== 'N/A' ? summary.peliculaTop : 'Ninguna' %>
+                        </h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">
+                            Esta película registra la mayor frecuencia de alquileres históricos acumulados por parte de los clientes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

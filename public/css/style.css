@@ -1778,3 +1778,564 @@ footer p span {
 .player-details p i {
     color: var(--color-gold);
 }
+
+/* ==========================================================================
+   Obsidian Cinematic - Panel de Reportes e Indicadores de Gestión
+   ========================================================================== */
+
+.reports-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 1.5rem auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.reports-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.reports-header-title h2 {
+    font-size: 2.2rem;
+    color: var(--text-main);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.reports-header-title h2 i {
+    color: var(--color-gerente);
+    text-shadow: 0 0 10px rgba(0, 206, 209, 0.35);
+}
+
+.report-meta-tag {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reports-actions-panel {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-report-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg-card-glass);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-main);
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-report-action:hover {
+    background: rgba(0, 206, 209, 0.1);
+    border-color: var(--color-gerente);
+    box-shadow: 0 0 15px rgba(0, 206, 209, 0.15);
+}
+
+.btn-report-action.btn-accent {
+    background: var(--color-gerente);
+    border-color: var(--color-gerente);
+    color: #08080a;
+}
+
+.btn-report-action.btn-accent:hover {
+    background: #00e5e8;
+    border-color: #00e5e8;
+    box-shadow: 0 0 20px rgba(0, 206, 209, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Grid de Indicadores Clave */
+.stats-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card-premium {
+    background: var(--bg-card-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-premium::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--color-gerente);
+    opacity: 0.65;
+    transition: all 0.3s ease;
+}
+
+.stat-card-premium:hover::before {
+    height: 100%;
+    opacity: 1;
+    width: 6px;
+}
+
+.stat-card-premium:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 206, 209, 0.3);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 206, 209, 0.05);
+}
+
+.stat-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.stat-card-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.stat-card-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    font-family: var(--font-body);
+}
+
+.stat-card-accent {
+    font-size: 0.85rem;
+    color: var(--text-success);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.stat-card-icon {
+    font-size: 2.2rem;
+    color: var(--color-gerente);
+    opacity: 0.45;
+    transition: all 0.3s ease;
+}
+
+.stat-card-premium:hover .stat-card-icon {
+    opacity: 0.9;
+    transform: scale(1.1) rotate(5deg);
+    color: var(--color-gerente);
+    text-shadow: 0 0 10px rgba(0, 206, 209, 0.4);
+}
+
+/* Layout de Reportes en Dos Columnas */
+.reports-layout-grid {
+    display: grid;
+    grid-template-columns: 7.5fr 4.5fr;
+    gap: 2rem;
+}
+
+@media (max-width: 992px) {
+    .reports-layout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Tarjeta de Reporte Principal */
+.report-section-card {
+    background: var(--bg-card-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: var(--shadow-cinematic);
+}
+
+.report-section-title {
+    font-size: 1.35rem;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.report-section-title i {
+    color: var(--color-gold);
+}
+
+/* Tabla / Ranking de Películas */
+.ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    gap: 1.25rem;
+    transition: all 0.25s ease;
+}
+
+.ranking-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+}
+
+.ranking-position {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.rank-first {
+    background: radial-gradient(circle, #ffe066 0%, #d4af37 100%);
+    color: #08080a;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+.rank-second {
+    background: radial-gradient(circle, #e6e6e6 0%, #a6a6a6 100%);
+    color: #08080a;
+    box-shadow: 0 0 15px rgba(166, 166, 166, 0.3);
+}
+
+.rank-third {
+    background: radial-gradient(circle, #ffb380 0%, #cd7f32 100%);
+    color: #08080a;
+    box-shadow: 0 0 15px rgba(205, 127, 50, 0.3);
+}
+
+.rank-rest {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ranking-poster {
+    width: 48px;
+    height: 68px;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ranking-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ranking-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.ranking-movie-title {
+    font-family: var(--font-body);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.ranking-movie-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.ranking-movie-meta span i {
+    margin-right: 0.25rem;
+}
+
+.ranking-stats {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    text-align: right;
+}
+
+.ranking-stat-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.ranking-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ranking-stat-count {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-gerente);
+}
+
+.ranking-stat-income {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-gold);
+}
+
+/* Gráfico de Barras de Distribución por Géneros */
+.genre-chart-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.genre-chart-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.genre-info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.genre-name {
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.genre-count {
+    color: var(--text-muted);
+}
+
+.genre-count span {
+    color: var(--color-gerente);
+    font-weight: 600;
+}
+
+.genre-bar-track {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.genre-bar-fill {
+    height: 100%;
+    border-radius: 5px;
+    background: linear-gradient(90deg, var(--color-gerente) 0%, #00e5e8 100%);
+    box-shadow: 0 0 10px rgba(0, 206, 209, 0.3);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Diferentes colores de barra para darle dinamismo */
+.genre-chart-item:nth-child(2n) .genre-bar-fill {
+    background: linear-gradient(90deg, var(--color-gold) 0%, #ffcf56 100%);
+    box-shadow: 0 0 10px rgba(229, 184, 66, 0.3);
+}
+
+.genre-chart-item:nth-child(3n) .genre-bar-fill {
+    background: linear-gradient(90deg, var(--color-admin) 0%, #b066ff 100%);
+    box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+}
+
+.genre-chart-item:nth-child(4n) .genre-bar-fill {
+    background: linear-gradient(90deg, #ff453a 0%, #ff6961 100%);
+    box-shadow: 0 0 10px rgba(255, 69, 58, 0.3);
+}
+
+/* Estilos de Impresión / PDF */
+@media print {
+    /* Ocultar barra de navegación, footer, botones y fondo animado */
+    header, footer, .reports-actions-panel, body::before, body::after, #cart-drawer, #cart-backdrop {
+        display: none !important;
+    }
+    
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 12pt;
+    }
+    
+    main {
+        padding: 0 !important;
+        background: transparent !important;
+    }
+    
+    .reports-container {
+        margin: 0 !important;
+        padding: 0 !important;
+        gap: 1.5rem;
+    }
+    
+    .reports-header {
+        border-bottom: 2px solid #000000;
+        padding-bottom: 1rem;
+    }
+    
+    .reports-header-title h2 {
+        color: #000000 !important;
+        text-shadow: none !important;
+        font-size: 20pt;
+    }
+    
+    .reports-header-title h2 i {
+        color: #000000 !important;
+        text-shadow: none !important;
+    }
+    
+    .report-meta-tag {
+        color: #333333 !important;
+    }
+    
+    .stat-card-premium {
+        background: #ffffff !important;
+        border: 1px solid #cccccc !important;
+        box-shadow: none !important;
+        color: #000000 !important;
+        padding: 1rem !important;
+    }
+    
+    .stat-card-premium::before {
+        background: #000000 !important;
+    }
+    
+    .stat-card-label {
+        color: #555555 !important;
+    }
+    
+    .stat-card-value {
+        color: #000000 !important;
+        font-size: 18pt;
+    }
+    
+    .stat-card-icon {
+        color: #333333 !important;
+        opacity: 1 !important;
+    }
+    
+    .reports-layout-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+    }
+    
+    .report-section-card {
+        background: #ffffff !important;
+        border: 1px solid #cccccc !important;
+        box-shadow: none !important;
+        padding: 1.5rem !important;
+        page-break-inside: avoid;
+    }
+    
+    .report-section-title {
+        color: #000000 !important;
+        border-bottom: 1px solid #666666 !important;
+    }
+    
+    .report-section-title i {
+        color: #000000 !important;
+    }
+    
+    .ranking-item {
+        background: #ffffff !important;
+        border: 1px solid #dddddd !important;
+        padding: 0.75rem !important;
+        page-break-inside: avoid;
+    }
+    
+    .ranking-movie-title {
+        color: #000000 !important;
+    }
+    
+    .ranking-movie-meta {
+        color: #444444 !important;
+    }
+    
+    .rank-first, .rank-second, .rank-third, .rank-rest {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: 1px solid #000000 !important;
+        box-shadow: none !important;
+    }
+    
+    .ranking-stat-count {
+        color: #000000 !important;
+    }
+    
+    .ranking-stat-income {
+        color: #000000 !important;
+        font-weight: 700;
+    }
+    
+    .genre-bar-track {
+        background: #eeeeee !important;
+        border: 1px solid #cccccc !important;
+    }
+    
+    .genre-bar-fill {
+        background: #888888 !important;
+        box-shadow: none !important;
+    }
+    
+    .genre-name {
+        color: #000000 !important;
+    }
+    
+    .genre-count {
+        color: #333333 !important;
+    }
+    
+    .genre-count span {
+        color: #000000 !important;
+    }
+}
+

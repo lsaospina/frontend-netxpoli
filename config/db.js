@@ -199,6 +199,36 @@ const initDb = async () => {
             }
             console.log('Películas semilla insertadas con éxito.');
         }
+
+        // Sembrar alquileres de prueba si la tabla está vacía
+        const countAlquileres = await dbGet('SELECT COUNT(*) as count FROM alquileres');
+        if (countAlquileres.count === 0) {
+            console.log('Tabla de alquileres vacía. Sembrando alquileres semilla...');
+            const alquileresSemilla = [
+                { usuario_id: 3, pelicula_id: 1, fecha_alquiler: '2026-05-18 10:30:00', fecha_devolucion: '2026-05-25 10:30:00', estado: 'devuelto' },
+                { usuario_id: 3, pelicula_id: 1, fecha_alquiler: '2026-05-20 14:15:00', fecha_devolucion: '2026-05-27 14:15:00', estado: 'activo' },
+                { usuario_id: 3, pelicula_id: 2, fecha_alquiler: '2026-05-19 16:45:00', fecha_devolucion: '2026-05-26 16:45:00', estado: 'activo' },
+                { usuario_id: 3, pelicula_id: 2, fecha_alquiler: '2026-05-22 09:00:00', fecha_devolucion: '2026-05-29 09:00:00', estado: 'activo' },
+                { usuario_id: 2, pelicula_id: 2, fecha_alquiler: '2026-05-15 18:20:00', fecha_devolucion: '2026-05-22 18:20:00', estado: 'devuelto' },
+                { usuario_id: 3, pelicula_id: 3, fecha_alquiler: '2026-05-21 11:00:00', fecha_devolucion: '2026-05-28 11:00:00', estado: 'activo' },
+                { usuario_id: 3, pelicula_id: 4, fecha_alquiler: '2026-05-23 20:30:00', fecha_devolucion: '2026-05-30 20:30:00', estado: 'activo' },
+                { usuario_id: 2, pelicula_id: 5, fecha_alquiler: '2026-05-24 15:00:00', fecha_devolucion: '2026-05-31 15:00:00', estado: 'activo' },
+                { usuario_id: 3, pelicula_id: 6, fecha_alquiler: '2026-05-17 12:00:00', fecha_devolucion: '2026-05-24 12:00:00', estado: 'devuelto' }
+            ];
+
+            for (const a of alquileresSemilla) {
+                await dbRun(
+                    `INSERT INTO alquileres (usuario_id, pelicula_id, fecha_alquiler, fecha_devolucion, estado) VALUES (?, ?, ?, ?, ?)`,
+                    [a.usuario_id, a.pelicula_id, a.fecha_alquiler, a.fecha_devolucion, a.estado]
+                );
+                
+                // Si el alquiler está activo, decrementamos el stock
+                if (a.estado === 'activo') {
+                    await dbRun('UPDATE peliculas SET stock = stock - 1 WHERE id = ?', [a.pelicula_id]);
+                }
+            }
+            console.log('Alquileres semilla insertados con éxito.');
+        }
     } catch (err) {
         console.error('Error al inicializar la base de datos:', err);
     }

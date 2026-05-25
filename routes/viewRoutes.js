@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Movie = require('../models/Movie');
 const Rental = require('../models/Rental');
+const Report = require('../models/Report');
 
 
 // Middleware para verificar si el usuario ha iniciado sesión
@@ -78,5 +79,33 @@ router.get('/rentals', requireLogin, async (req, res) => {
     }
 });
 
-module.exports = router;
+// Vista de Reportes (solo gerente y administrador)
+const requireManager = (req, res, next) => {
+    if (!req.session || !req.session.user) return res.redirect('/login');
+    if (!['gerente', 'administrador'].includes(req.session.user.tipo_usuario)) {
+        return res.redirect('/dashboard');
+    }
+    next();
+};
 
+router.get('/reports', requireManager, async (req, res) => {
+    try {
+        const [topMovies, summary, byGenre] = await Promise.all([
+            Report.getMostRented(10),
+            Report.getSummary(),
+            Report.getRentalsByGenre()
+        ]);
+        res.render('reports', {
+            title: 'Reportes - CineFlix',
+            user: req.session.user,
+            topMovies,
+            summary,
+            byGenre
+        });
+    } catch (error) {
+        console.error('Error al cargar reportes:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
+module.exports = router;
