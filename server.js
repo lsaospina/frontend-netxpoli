@@ -4,6 +4,7 @@ const path = require('path');
 const { initDb } = require('./config/db');
 const viewRoutes = require('./routes/viewRoutes');
 const authRoutes = require('./routes/authRoutes');
+const rentalRoutes = require('./routes/rentalRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -43,6 +44,7 @@ app.use((req, res, next) => {
 // Registrar las rutas
 app.use('/', viewRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/rentals', rentalRoutes);
 
 // Servidor escuchando
 app.listen(PORT, () => {

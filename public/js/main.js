@@ -18,6 +18,34 @@ document.addEventListener('DOMContentLoaded', () => {
     if (registerForm) {
         registerForm.addEventListener('submit', handleRegister);
     }
+
+    // Inicializar Carrito (Solo si existe la barra lateral del carrito en el DOM)
+    if (document.getElementById('cart-drawer')) {
+        initCart();
+    }
+
+    // Inicializar Reproductor (Solo si existe el modal en el DOM)
+    if (document.getElementById('player-modal')) {
+        initPlayer();
+    }
+
+    // Capturar clics de "Agregar al carrito" vía delegación de eventos
+    document.addEventListener('click', (e) => {
+        const btnAdd = e.target.closest('.btn-add-to-cart');
+        if (btnAdd) {
+            const id = btnAdd.getAttribute('data-id');
+            const title = btnAdd.getAttribute('data-title');
+            const price = parseFloat(btnAdd.getAttribute('data-price'));
+            const image = btnAdd.getAttribute('data-image');
+            addToCart({ id, title, price, image });
+        }
+    });
+
+    // Capturar devoluciones de alquileres
+    const returnButtons = document.querySelectorAll('.btn-return-movie-action');
+    returnButtons.forEach(btn => {
+        btn.addEventListener('click', handleReturnRental);
+    });
 });
 
 /**
@@ -246,3 +274,393 @@ spinnerStyle.innerText = `
 }
 `;
 document.head.appendChild(spinnerStyle);
+
+/* ==========================================================================
+   CineFlix - Funcionalidad de Carrito de Compras y Alquileres
+   ========================================================================== */
+
+let cart = [];
+
+/**
+ * Inicializar el Carrito
+ */
+function initCart() {
+    // Cargar del localStorage
+    try {
+        const storedCart = localStorage.getItem('cart-cineflix');
+        cart = storedCart ? JSON.parse(storedCart) : [];
+    } catch (e) {
+        cart = [];
+    }
+
+    updateCartBadge();
+    renderCart();
+
+    // Eventos para abrir/cerrar carrito
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartClose = document.getElementById('cart-close');
+    const cartBackdrop = document.getElementById('cart-backdrop');
+
+    if (cartToggle) {
+        cartToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            openCartDrawer(true);
+        });
+    }
+
+    if (cartClose) {
+        cartClose.addEventListener('click', () => openCartDrawer(false));
+    }
+
+    if (cartBackdrop) {
+        cartBackdrop.addEventListener('click', () => openCartDrawer(false));
+    }
+
+    // Evento de Checkout
+    const btnCheckout = document.getElementById('btn-checkout');
+    if (btnCheckout) {
+        btnCheckout.addEventListener('click', handleCheckout);
+    }
+}
+
+/**
+ * Abrir o Cerrar la barra lateral del carrito
+ */
+function openCartDrawer(isOpen) {
+    const drawer = document.getElementById('cart-drawer');
+    const backdrop = document.getElementById('cart-backdrop');
+    if (!drawer) return;
+
+    if (isOpen) {
+        drawer.classList.add('open');
+        if (backdrop) backdrop.classList.add('active');
+        renderCart();
+    } else {
+        drawer.classList.remove('open');
+        if (backdrop) backdrop.classList.remove('active');
+    }
+}
+
+/**
+ * Añadir película al carrito
+ */
+function addToCart(movie) {
+    // Verificar si ya existe en el carrito
+    const exists = cart.some(item => item.id === movie.id);
+    if (exists) {
+        showToast('Ya en el carrito', `"${movie.title}" ya está agregada al carrito.`, 'error');
+        return;
+    }
+
+    cart.push(movie);
+    saveCart();
+    updateCartBadge();
+    renderCart();
+    showToast('Película Agregada', `"${movie.title}" se añadió a tu carrito.`, 'success');
+    
+    // Abrir automáticamente el drawer para feedback inmediato
+    setTimeout(() => openCartDrawer(true), 300);
+}
+
+/**
+ * Guardar carrito en LocalStorage
+ */
+function saveCart() {
+    localStorage.setItem('cart-cineflix', JSON.stringify(cart));
+}
+
+/**
+ * Actualizar contador flotante del carrito
+ */
+function updateCartBadge() {
+    const badge = document.getElementById('cart-count');
+    if (badge) {
+        badge.innerText = cart.length;
+        badge.style.display = cart.length === 0 ? 'none' : 'flex';
+    }
+}
+
+/**
+ * Renderizar items en la barra lateral del carrito
+ */
+function renderCart() {
+    const container = document.getElementById('cart-items-container');
+    const totalPriceEl = document.getElementById('cart-total-price');
+    const btnCheckout = document.getElementById('btn-checkout');
+    if (!container) return;
+
+    if (cart.length === 0) {
+        container.innerHTML = '<p class="empty-cart-msg">Tu carrito está vacío.</p>';
+        if (totalPriceEl) totalPriceEl.innerText = '$0.00';
+        if (btnCheckout) btnCheckout.disabled = true;
+        return;
+    }
+
+    let total = 0;
+    container.innerHTML = cart.map(item => {
+        total += item.price;
+        return `
+            <div class="cart-item" data-id="${item.id}">
+                <img src="${item.image}" alt="${item.title}" class="cart-item-poster">
+                <div class="cart-item-info">
+                    <h4 class="cart-item-title">${item.title}</h4>
+                    <span class="cart-item-price">$${item.price.toFixed(2)}</span>
+                </div>
+                <button class="btn-remove-item" onclick="removeFromCart('${item.id}')" title="Eliminar del carrito">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    if (totalPriceEl) totalPriceEl.innerText = `$${total.toFixed(2)}`;
+    if (btnCheckout) btnCheckout.disabled = false;
+}
+
+/**
+ * Eliminar película del carrito
+ */
+window.removeFromCart = function(id) {
+    cart = cart.filter(item => item.id !== id);
+    saveCart();
+    updateCartBadge();
+    renderCart();
+    showToast('Película Eliminada', 'Se quitó el título del carrito.', 'success');
+};
+
+/**
+ * Procesar el alquiler (Checkout)
+ */
+async function handleCheckout() {
+    if (cart.length === 0) return;
+
+    const btnCheckout = document.getElementById('btn-checkout');
+    const movieIds = cart.map(item => parseInt(item.id, 10));
+
+    setLoadingState(btnCheckout, true, 'Confirmando...');
+
+    try {
+        const response = await fetch('/api/rentals', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ movieIds })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showToast('¡Alquiler Completo!', data.message, 'success');
+            
+            // Limpiar carrito
+            cart = [];
+            saveCart();
+            updateCartBadge();
+            renderCart();
+            
+            // Cerrar el drawer y redirigir
+            setTimeout(() => {
+                openCartDrawer(false);
+                window.location.href = data.redirect;
+            }, 1200);
+        } else {
+            showToast('Error de Alquiler', data.message || 'No se pudo completar el alquiler.', 'error');
+            setLoadingState(btnCheckout, false, '<i class="fa-solid fa-credit-card"></i> Confirmar Alquiler');
+        }
+    } catch (error) {
+        console.error('Error en checkout:', error);
+        showToast('Error de Conexión', 'Hubo un problema al procesar el alquiler.', 'error');
+        setLoadingState(btnCheckout, false, '<i class="fa-solid fa-credit-card"></i> Confirmar Alquiler');
+    }
+}
+
+/**
+ * Procesar la devolución de una película alquilada
+ */
+async function handleReturnRental(e) {
+    const btn = e.currentTarget;
+    const rentalId = btn.getAttribute('data-id');
+    const movieTitle = btn.getAttribute('data-title');
+
+    if (!confirm(`¿Estás seguro de que deseas devolver "${movieTitle}"?`)) {
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Devolviendo...';
+
+    try {
+        const response = await fetch(`/api/rentals/${rentalId}/return`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showToast('Devolución Completada', data.message, 'success');
+            
+            // Actualizar interfaz visualmente sin recargar toda la página inmediatamente
+            const card = document.getElementById(`rental-card-${rentalId}`);
+            if (card) {
+                card.classList.add('devuelto');
+                // Cambiar el badge a devuelto
+                const badge = card.querySelector('.rental-status-badge');
+                if (badge) {
+                    badge.className = 'rental-status-badge devuelto';
+                    badge.innerText = 'Devuelto';
+                }
+                // Deshabilitar botones de acción
+                const actionSection = card.querySelector('.rental-actions');
+                if (actionSection) {
+                    actionSection.innerHTML = `
+                        <button class="btn-play-movie disabled" disabled>
+                            <i class="fa-solid fa-ban"></i> No disponible
+                        </button>
+                    `;
+                }
+            }
+            
+            // Recargar después de un breve retraso para actualizar el stock real en el menú del catálogo
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            showToast('Error de Devolución', data.message || 'No se pudo devolver la película.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Devolver';
+        }
+    } catch (error) {
+        console.error('Error al devolver película:', error);
+        showToast('Error de Red', 'Problema al comunicarse con el servidor.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Devolver';
+    }
+}
+
+/**
+ * Funcionalidad del Reproductor de Video Simulado
+ */
+let playerTimelineInterval = null;
+
+function initPlayer() {
+    const playButtons = document.querySelectorAll('.btn-play-movie:not(.disabled)');
+    const modal = document.getElementById('player-modal');
+    const closeBtn = document.getElementById('player-close');
+
+    if (!modal) return;
+
+    playButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const title = btn.getAttribute('data-title');
+            const poster = btn.getAttribute('data-image');
+            
+            // Rellenar datos en el modal
+            document.getElementById('player-movie-title').innerText = title;
+            const screenPoster = document.getElementById('player-video-poster');
+            if (screenPoster) {
+                screenPoster.style.backgroundImage = `url('${poster}')`;
+            }
+
+            // Mostrar modal
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden'; // Evitar scroll de fondo
+
+            // Iniciar animación de carga
+            startSimulatedPlayer();
+        });
+    });
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closePlayer);
+    }
+}
+
+function closePlayer() {
+    const modal = document.getElementById('player-modal');
+    if (modal) {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    // Detener intervalos y estados
+    if (playerTimelineInterval) {
+        clearInterval(playerTimelineInterval);
+    }
+    const screen = document.querySelector('.player-screen');
+    if (screen) screen.classList.remove('playing');
+}
+
+function startSimulatedPlayer() {
+    const loader = document.querySelector('.player-loader');
+    const screen = document.querySelector('.player-screen');
+    const waves = document.getElementById('audio-waves');
+    const progressFill = document.getElementById('player-progress-fill');
+    const playBtn = document.getElementById('player-play-btn');
+    const timeElapsedEl = document.querySelector('.time-elapsed');
+
+    // Resetear vistas
+    loader.style.display = 'flex';
+    screen.style.display = 'none';
+    if (screen) screen.classList.remove('playing');
+    if (progressFill) progressFill.style.width = '0%';
+    if (timeElapsedEl) timeElapsedEl.innerText = '00:00';
+    if (playBtn) playBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+    if (waves) waves.style.display = 'none';
+
+    // Simular carga de stream de 2.5 segundos
+    setTimeout(() => {
+        loader.style.display = 'none';
+        screen.style.display = 'flex';
+        screen.classList.add('playing');
+        if (waves) waves.style.display = 'flex';
+
+        // Simular progreso de la película
+        let elapsedSeconds = 0;
+        if (playerTimelineInterval) clearInterval(playerTimelineInterval);
+
+        playerTimelineInterval = setInterval(() => {
+            if (screen.classList.contains('playing')) {
+                elapsedSeconds += 1;
+                
+                // Formatear minutos/segundos transcurridos
+                const minutes = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
+                const seconds = (elapsedSeconds % 60).toString().padStart(2, '0');
+                timeElapsedEl.innerText = `${minutes}:${seconds}`;
+
+                // Porcentaje para barra de progreso
+                const percentage = (elapsedSeconds / 240) * 100; // Película simulada dura 4 minutos en este test
+                if (progressFill) progressFill.style.width = `${Math.min(percentage, 100)}%`;
+
+                if (elapsedSeconds >= 240) {
+                    clearInterval(playerTimelineInterval);
+                    screen.classList.remove('playing');
+                    if (playBtn) playBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                    if (waves) waves.style.display = 'none';
+                    showToast('Fin de la Película', 'La transmisión simulada ha finalizado.', 'info');
+                }
+            }
+        }, 1000);
+    }, 2500);
+
+    // Controles de Play/Pause
+    if (playBtn) {
+        // Clonar botón para remover listeners antiguos
+        const newPlayBtn = playBtn.cloneNode(true);
+        playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+
+        newPlayBtn.addEventListener('click', () => {
+            if (screen.classList.contains('playing')) {
+                screen.classList.remove('playing');
+                newPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                if (waves) waves.style.display = 'none';
+            } else {
+                screen.classList.add('playing');
+                newPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                if (waves) waves.style.display = 'flex';
+            }
+        });
+    }
+}

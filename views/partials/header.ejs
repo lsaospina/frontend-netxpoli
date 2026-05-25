@@ -22,7 +22,11 @@
                     
                     <% if (user.tipo_usuario === 'cliente') { %>
                         <a href="/catalog" class="nav-link"><i class="fa-solid fa-compact-disc"></i> Catálogo</a>
-                        <a href="#" class="nav-link"><i class="fa-solid fa-ticket"></i> Mis Alquileres</a>
+                        <a href="/rentals" class="nav-link"><i class="fa-solid fa-ticket"></i> Mis Alquileres</a>
+                        <a href="#" id="cart-toggle" class="nav-link cart-nav-btn">
+                            <i class="fa-solid fa-cart-shopping"></i> Carrito
+                            <span id="cart-count" class="cart-badge">0</span>
+                        </a>
                     <% } else if (user.tipo_usuario === 'gerente') { %>
                         <a href="#" class="nav-link"><i class="fa-solid fa-chart-line"></i> Reportes</a>
                         <a href="/catalog" class="nav-link"><i class="fa-solid fa-tags"></i> Gestionar Catálogo</a>
@@ -40,4 +44,29 @@
             </nav>
         </div>
     </header>
+
+    <!-- Cart Drawer (Slide-over panel) -->
+    <div id="cart-drawer" class="cart-drawer">
+        <div class="cart-drawer-header">
+            <h3><i class="fa-solid fa-cart-shopping"></i> Tu Carrito</h3>
+            <button id="cart-close" class="btn-close-drawer">&times;</button>
+        </div>
+        <div class="cart-drawer-body">
+            <div id="cart-items-container">
+                <p class="empty-cart-msg">Tu carrito está vacío.</p>
+            </div>
+        </div>
+        <div class="cart-drawer-footer">
+            <div class="cart-total-section">
+                <span>Total:</span>
+                <span id="cart-total-price">$0.00</span>
+            </div>
+            <button id="btn-checkout" class="btn-checkout" disabled>
+                <i class="fa-solid fa-credit-card"></i> Confirmar Alquiler
+            </button>
+        </div>
+    </div>
+    <!-- Cart Backdrop overlay -->
+    <div id="cart-backdrop" class="cart-backdrop"></div>
+
     <main>

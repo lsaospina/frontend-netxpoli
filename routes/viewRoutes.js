@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Movie = require('../models/Movie');
+const Rental = require('../models/Rental');
+
 
 // Middleware para verificar si el usuario ha iniciado sesión
 const requireLogin = (req, res, next) => {
@@ -61,4 +63,20 @@ router.get('/catalog', requireLogin, async (req, res) => {
     }
 });
 
+// Vista de Mis Alquileres (protegida)
+router.get('/rentals', requireLogin, async (req, res) => {
+    try {
+        const rentals = await Rental.getActiveByUser(req.session.user.id);
+        res.render('rentals', {
+            title: 'Mis Alquileres - CineFlix',
+            user: req.session.user,
+            rentals: rentals
+        });
+    } catch (error) {
+        console.error('Error al cargar alquileres:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
 module.exports = router;
+

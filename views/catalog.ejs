@@ -74,13 +74,23 @@
 
                     <!-- Botón de acción -->
                     <div class="movie-action-section">
-                        <% if (movie.stock > 0) { %>
-                            <button class="btn-rent-movie" data-id="<%= movie.id %>" data-title="<%= movie.titulo %>">
-                                <i class="fa-solid fa-ticket"></i> Alquilar ahora
-                            </button>
+                        <% if (user.tipo_usuario === 'cliente') { %>
+                            <% if (movie.stock > 0) { %>
+                                <button class="btn-add-to-cart" 
+                                        data-id="<%= movie.id %>" 
+                                        data-title="<%= movie.titulo %>"
+                                        data-price="<%= movie.precio_alquiler %>"
+                                        data-image="<%= movie.imagen_url %>">
+                                    <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+                                </button>
+                            <% } else { %>
+                                <button class="btn-add-to-cart disabled" disabled>
+                                    <i class="fa-solid fa-ban"></i> No disponible
+                                </button>
+                            <% } %>
                         <% } else { %>
-                            <button class="btn-rent-movie disabled" disabled>
-                                <i class="fa-solid fa-ban"></i> No disponible
+                            <button class="btn-edit-movie-mock" data-id="<%= movie.id %>" data-title="<%= movie.titulo %>">
+                                <i class="fa-solid fa-pen-to-square"></i> Editar Título
                             </button>
                         <% } %>
                     </div>
@@ -149,15 +159,15 @@
             });
         });
 
-        // Alquiler provisional (muestra Toast)
-        const rentButtons = document.querySelectorAll('.btn-rent-movie:not(.disabled)');
-        rentButtons.forEach(button => {
+        // Funcionalidad de edición simulada para Gerentes/Admins
+        const editButtonsMock = document.querySelectorAll('.btn-edit-movie-mock');
+        editButtonsMock.forEach(button => {
             button.addEventListener('click', () => {
                 const movieTitle = button.getAttribute('data-title');
                 if (typeof showToast === 'function') {
-                    showToast('¡Película Seleccionada!', `Has solicitado alquilar "${movieTitle}". Redirigiendo a pasarela...`, 'success');
+                    showToast('Gestión de Catálogo', `Módulo de edición para "${movieTitle}" está en desarrollo.`, 'success');
                 } else {
-                    alert(`Has alquilado "${movieTitle}" exitosamente!`);
+                    alert(`Módulo de edición para "${movieTitle}" en desarrollo.`);
                 }
             });
         });

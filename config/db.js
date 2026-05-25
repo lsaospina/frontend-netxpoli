@@ -74,6 +74,22 @@ const initDb = async () => {
         `);
         console.log('Tabla "peliculas" verificada/creada.');
 
+        // Crear la tabla de alquileres
+        await dbRun(`
+            CREATE TABLE IF NOT EXISTS alquileres (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                usuario_id INTEGER NOT NULL,
+                pelicula_id INTEGER NOT NULL,
+                fecha_alquiler DATETIME DEFAULT CURRENT_TIMESTAMP,
+                fecha_devolucion DATETIME NOT NULL,
+                estado TEXT NOT NULL DEFAULT 'activo', -- 'activo', 'devuelto'
+                FOREIGN KEY(usuario_id) REFERENCES usuarios(id),
+                FOREIGN KEY(pelicula_id) REFERENCES peliculas(id)
+            )
+        `);
+        console.log('Tabla "alquileres" verificada/creada.');
+
+
         // Sembrar usuarios si la base de datos está vacía
         const count = await dbGet('SELECT COUNT(*) as count FROM usuarios');
         if (count.count === 0) {
