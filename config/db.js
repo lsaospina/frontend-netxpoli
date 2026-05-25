@@ -56,6 +56,24 @@ const initDb = async () => {
         `);
         console.log('Tabla "usuarios" verificada/creada.');
 
+        // Crear la tabla de películas
+        await dbRun(`
+            CREATE TABLE IF NOT EXISTS peliculas (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                titulo TEXT NOT NULL,
+                sinopsis TEXT,
+                genero TEXT NOT NULL,
+                duracion INTEGER,
+                director TEXT,
+                ano INTEGER,
+                imagen_url TEXT,
+                precio_alquiler REAL NOT NULL DEFAULT 3.99,
+                stock INTEGER NOT NULL DEFAULT 5,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('Tabla "peliculas" verificada/creada.');
+
         // Sembrar usuarios si la base de datos está vacía
         const count = await dbGet('SELECT COUNT(*) as count FROM usuarios');
         if (count.count === 0) {
@@ -82,6 +100,88 @@ const initDb = async () => {
             );
 
             console.log('Usuarios semilla insertados con éxito.');
+        }
+
+        // Sembrar películas si la tabla está vacía
+        const countPeliculas = await dbGet('SELECT COUNT(*) as count FROM peliculas');
+        if (countPeliculas.count === 0) {
+            console.log('Tabla de películas vacía. Sembrando catálogo por defecto...');
+            const peliculasSemilla = [
+                {
+                    titulo: 'Inception',
+                    sinopsis: 'Un ladrón que roba secretos corporativos a través del uso de la tecnología de compartir sueños, se le da la tarea inversa de plantar una idea en la mente de un director ejecutivo.',
+                    genero: 'Ciencia Ficción',
+                    duracion: 148,
+                    director: 'Christopher Nolan',
+                    ano: 2010,
+                    imagen_url: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600&auto=format&fit=crop',
+                    precio_alquiler: 3.99,
+                    stock: 5
+                },
+                {
+                    titulo: 'Interstellar',
+                    sinopsis: 'Un equipo de exploradores viaja a través de un agujero de gusano en el espacio en un intento por asegurar la supervivencia de la humanidad.',
+                    genero: 'Ciencia Ficción',
+                    duracion: 169,
+                    director: 'Christopher Nolan',
+                    ano: 2014,
+                    imagen_url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop',
+                    precio_alquiler: 4.50,
+                    stock: 4
+                },
+                {
+                    titulo: 'The Matrix',
+                    sinopsis: 'Cuando una bella desconocida lleva al hacker Neo a un inframundo prohibido, él descubre la impactante verdad: la vida que conoce es un elaborado engaño de una inteligencia cibernética malvada.',
+                    genero: 'Acción',
+                    duracion: 136,
+                    director: 'Lana Wachowski, Lilly Wachowski',
+                    ano: 1999,
+                    imagen_url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop',
+                    precio_alquiler: 2.99,
+                    stock: 7
+                },
+                {
+                    titulo: 'Parasite',
+                    sinopsis: 'La codicia y la discriminación de clase amenazan la relación recién formada entre la rica familia Park y el clan Kim, que carece de recursos.',
+                    genero: 'Drama',
+                    duracion: 132,
+                    director: 'Bong Joon Ho',
+                    ano: 2019,
+                    imagen_url: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=600&auto=format&fit=crop',
+                    precio_alquiler: 3.99,
+                    stock: 3
+                },
+                {
+                    titulo: 'Spirited Away',
+                    sinopsis: 'Durante el viaje de su familia a los suburbios, una niña de 10 años de edad deambula por un mundo gobernado por dioses, brujas y espíritus, y donde los humanos se transforman en bestias.',
+                    genero: 'Animación',
+                    duracion: 125,
+                    director: 'Hayao Miyazaki',
+                    ano: 2001,
+                    imagen_url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=600&auto=format&fit=crop',
+                    precio_alquiler: 3.50,
+                    stock: 6
+                },
+                {
+                    titulo: 'Pulp Fiction',
+                    sinopsis: 'Las vidas de dos gángsters de la mafia, un boxeador, la esposa de un gángster y una pareja de bandidos se entrelazan en cuatro historias de violencia y redención.',
+                    genero: 'Crimen',
+                    duracion: 154,
+                    director: 'Quentin Tarantino',
+                    ano: 1994,
+                    imagen_url: 'https://images.unsplash.com/photo-1593085512500-5d55148d6f0d?q=80&w=600&auto=format&fit=crop',
+                    precio_alquiler: 2.99,
+                    stock: 5
+                }
+            ];
+
+            for (const p of peliculasSemilla) {
+                await dbRun(
+                    `INSERT INTO peliculas (titulo, sinopsis, genero, duracion, director, ano, imagen_url, precio_alquiler, stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    [p.titulo, p.sinopsis, p.genero, p.duracion, p.director, p.ano, p.imagen_url, p.precio_alquiler, p.stock]
+                );
+            }
+            console.log('Películas semilla insertadas con éxito.');
         }
     } catch (err) {
         console.error('Error al inicializar la base de datos:', err);

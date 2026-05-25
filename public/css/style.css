@@ -628,3 +628,421 @@ footer p span {
         font-size: 2.2rem;
     }
 }
+
+/* ==========================================================================
+   Estilos de la Vista del Catálogo de Películas
+   ========================================================================== */
+
+.catalog-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    animation: fadeIn 0.8s ease forwards;
+}
+
+.catalog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+}
+
+.catalog-title-section h1 {
+    font-size: 2.8rem;
+    background: linear-gradient(135deg, #ffffff 0%, #cfcfd5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.catalog-title-section p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* Buscador */
+.search-bar-wrapper {
+    position: relative;
+    max-width: 400px;
+    width: 100%;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    pointer-events: none;
+    transition: color 0.3s ease;
+}
+
+#catalog-search {
+    width: 100%;
+    background: rgba(18, 18, 22, 0.6);
+    border: 1px solid var(--border-subtle);
+    border-radius: 50px;
+    padding: 0.85rem 1.25rem 0.85rem 3rem;
+    font-size: 1rem;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#catalog-search:focus {
+    outline: none;
+    border-color: var(--border-active);
+    box-shadow: 0 0 15px var(--color-primary-glow);
+    background: rgba(18, 18, 22, 0.85);
+}
+
+#catalog-search:focus + .search-icon {
+    color: var(--color-primary);
+}
+
+/* Filtros de Género */
+.genre-filters-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(5px);
+}
+
+.filters-label {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.genre-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.genre-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.genre-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.genre-btn.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--text-main);
+    box-shadow: 0 0 10px var(--color-primary-glow);
+}
+
+/* Mensaje Sin Resultados */
+.no-results-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 2rem;
+    text-align: center;
+    color: var(--text-muted);
+    background: var(--bg-card-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-cinematic);
+}
+
+.no-results-container i {
+    font-size: 4rem;
+    color: var(--color-primary);
+    opacity: 0.5;
+    margin-bottom: 1.5rem;
+}
+
+.no-results-container h3 {
+    font-size: 1.6rem;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}
+
+/* Grid de Películas */
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 2rem;
+}
+
+/* Tarjeta de Película */
+.movie-card {
+    background: var(--bg-card-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.movie-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(229, 9, 20, 0.05);
+    border-color: rgba(229, 9, 20, 0.25);
+}
+
+/* Contenedor de la Imagen */
+.movie-poster-wrapper {
+    position: relative;
+    padding-top: 145%; /* Aspect Ratio 2:3 aproximado */
+    overflow: hidden;
+    background: #000;
+}
+
+.movie-poster-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.movie-card:hover .movie-poster-img {
+    transform: scale(1.08);
+}
+
+/* Overlay de la Tarjeta */
+.movie-poster-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(8, 8, 10, 0.95) 10%, rgba(8, 8, 10, 0.7) 60%, rgba(0, 0, 0, 0.4) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    display: flex;
+    align-items: flex-end;
+    padding: 1.5rem;
+}
+
+.movie-card:hover .movie-poster-overlay {
+    opacity: 1;
+}
+
+.overlay-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transform: translateY(15px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.movie-card:hover .overlay-content {
+    transform: translateY(0);
+}
+
+.overlay-genre-badge {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: var(--color-gold);
+    color: #000;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+}
+
+.overlay-synopsis {
+    font-size: 0.85rem;
+    color: #e2e2e8;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.overlay-info-row {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.overlay-info-row span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Cuerpo de la Tarjeta */
+.movie-card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.movie-genre-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-gold);
+    margin-bottom: 0.35rem;
+}
+
+.movie-card-title {
+    font-size: 1.25rem;
+    color: var(--text-main);
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-family: var(--font-body);
+    font-weight: 600;
+}
+
+.movie-card-director {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.movie-card-director span {
+    color: #d1d1d6;
+    font-weight: 500;
+}
+
+.movie-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    margin-top: auto;
+}
+
+.movie-price-tag {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: flex-start;
+}
+
+.price-symbol {
+    font-size: 0.85rem;
+    color: var(--color-gold);
+    margin-top: 0.2rem;
+    margin-right: 0.1rem;
+}
+
+.movie-stock-tag {
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+}
+
+.movie-stock-tag.in-stock {
+    background: rgba(48, 209, 88, 0.1);
+    color: var(--text-success);
+}
+
+.movie-stock-tag.out-of-stock {
+    background: rgba(255, 69, 58, 0.1);
+    color: var(--text-error);
+}
+
+/* Botón Alquilar */
+.btn-rent-movie {
+    width: 100%;
+    background: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    color: var(--text-main);
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    font-family: var(--font-body);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px var(--color-primary-glow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-rent-movie:hover:not(.disabled) {
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+    box-shadow: 0 0 15px var(--color-primary-glow);
+    transform: translateY(-2px);
+}
+
+.btn-rent-movie:active:not(.disabled) {
+    transform: translateY(0);
+}
+
+.btn-rent-movie.disabled {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: var(--border-subtle);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Responsivo para el Catálogo */
+@media (max-width: 768px) {
+    .catalog-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+    
+    .search-bar-wrapper {
+        max-width: 100%;
+    }
+    
+    .catalog-title-section h1 {
+        font-size: 2.2rem;
+    }
+    
+    .movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.5rem;
+    }
+}

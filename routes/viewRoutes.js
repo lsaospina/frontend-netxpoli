@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const Movie = require('../models/Movie');
 
 // Middleware para verificar si el usuario ha iniciado sesión
 const requireLogin = (req, res, next) => {
@@ -41,6 +42,23 @@ router.get('/dashboard', requireLogin, (req, res) => {
         title: 'Panel de Control - CineFlix',
         user: req.session.user 
     });
+});
+
+// Vista de Catálogo (protegida)
+router.get('/catalog', requireLogin, async (req, res) => {
+    try {
+        const movies = await Movie.getAll();
+        const genres = await Movie.getGenres();
+        res.render('catalog', {
+            title: 'Catálogo de Películas - CineFlix',
+            user: req.session.user,
+            movies: movies,
+            genres: genres
+        });
+    } catch (error) {
+        console.error('Error al cargar catálogo:', error);
+        res.status(500).send('Error interno del servidor');
+    }
 });
 
 module.exports = router;
