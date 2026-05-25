@@ -71,6 +71,28 @@ class Report {
         `;
         return await dbAll(sql);
     }
+
+    /**
+     * Obtener las películas mejor calificadas del catálogo
+     */
+    static async getBestRated(limit = 10) {
+        const sql = `
+            SELECT
+                id,
+                titulo,
+                genero,
+                imagen_url,
+                director,
+                stock,
+                precio_alquiler,
+                calificacion
+            FROM peliculas
+            WHERE calificacion > 0.0
+            ORDER BY calificacion DESC, titulo ASC
+            LIMIT ?
+        `;
+        return await dbAll(sql, [limit]);
+    }
 }
 
 module.exports = Report;

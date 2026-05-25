@@ -59,6 +59,39 @@
                     <h3 class="movie-card-title"><%= movie.titulo %></h3>
                     <p class="movie-card-director">Director: <span><%= movie.director %></span></p>
                     
+                    <%# Rating Section %>
+                    <div class="movie-rating-section" data-movie-id="<%= movie.id %>">
+                        <div class="movie-avg-rating">
+                            <div class="stars-display">
+                                <% 
+                                    var avgRating = movie.calificacion || 0;
+                                    for (var s = 1; s <= 5; s++) {
+                                        if (s <= Math.floor(avgRating)) { %>
+                                            <i class="fa-solid fa-star star-filled"></i>
+                                        <% } else if (s - 0.5 <= avgRating) { %>
+                                            <i class="fa-solid fa-star-half-stroke star-filled"></i>
+                                        <% } else { %>
+                                            <i class="fa-regular fa-star star-empty"></i>
+                                        <% } 
+                                    } %>
+                            </div>
+                            <span class="avg-rating-value"><%= avgRating.toFixed(1) %></span>
+                        </div>
+                        <% if (user.tipo_usuario === 'cliente') { %>
+                            <div class="user-rating-input">
+                                <span class="rate-label">Tu calificación:</span>
+                                <div class="star-input-group" data-movie-id="<%= movie.id %>">
+                                    <% var userRating = (typeof userRatings !== 'undefined' && userRatings[movie.id]) ? userRatings[movie.id] : 0; %>
+                                    <% for (var r = 1; r <= 5; r++) { %>
+                                        <i class="fa-star star-btn <%= r <= userRating ? 'fa-solid active' : 'fa-regular' %>" 
+                                           data-value="<%= r %>"
+                                           title="<%= r %> estrella<%= r > 1 ? 's' : '' %>"></i>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+
                     <div class="movie-card-meta">
                         <div class="movie-price-tag">
                             <span class="price-symbol">$</span><%= movie.precio_alquiler.toFixed(2) %>
@@ -169,6 +202,106 @@
                 } else {
                     alert(`Módulo de edición para "${movieTitle}" en desarrollo.`);
                 }
+            });
+        });
+
+        // === Funcionalidad de Calificación con Estrellas ===
+        document.querySelectorAll('.star-input-group').forEach(group => {
+            const stars = group.querySelectorAll('.star-btn');
+            const movieId = group.getAttribute('data-movie-id');
+
+            // Hover effects
+            stars.forEach((star, index) => {
+                star.addEventListener('mouseenter', () => {
+                    stars.forEach((s, i) => {
+                        if (i <= index) {
+                            s.classList.add('fa-solid', 'hover');
+                            s.classList.remove('fa-regular');
+                        } else {
+                            if (!s.classList.contains('active')) {
+                                s.classList.remove('fa-solid', 'hover');
+                                s.classList.add('fa-regular');
+                            }
+                        }
+                    });
+                });
+
+                star.addEventListener('mouseleave', () => {
+                    stars.forEach(s => {
+                        s.classList.remove('hover');
+                        if (s.classList.contains('active')) {
+                            s.classList.add('fa-solid');
+                            s.classList.remove('fa-regular');
+                        } else {
+                            s.classList.remove('fa-solid');
+                            s.classList.add('fa-regular');
+                        }
+                    });
+                });
+
+                // Click to rate
+                star.addEventListener('click', async () => {
+                    const ratingValue = parseInt(star.getAttribute('data-value'));
+                    
+                    try {
+                        const response = await fetch(`/api/ratings/${movieId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ rating: ratingValue })
+                        });
+                        const data = await response.json();
+
+                        if (data.success) {
+                            // Update active states
+                            stars.forEach((s, i) => {
+                                if (i < ratingValue) {
+                                    s.classList.add('fa-solid', 'active');
+                                    s.classList.remove('fa-regular');
+                                } else {
+                                    s.classList.remove('fa-solid', 'active');
+                                    s.classList.add('fa-regular');
+                                }
+                            });
+
+                            // Update average display
+                            const section = group.closest('.movie-rating-section');
+                            if (section) {
+                                const avgEl = section.querySelector('.avg-rating-value');
+                                if (avgEl) avgEl.textContent = data.data.promedio.toFixed(1);
+                                
+                                // Update average stars display
+                                const starsDisplay = section.querySelector('.stars-display');
+                                if (starsDisplay) {
+                                    const avg = data.data.promedio;
+                                    let starsHtml = '';
+                                    for (let i = 1; i <= 5; i++) {
+                                        if (i <= Math.floor(avg)) {
+                                            starsHtml += '<i class="fa-solid fa-star star-filled"></i>';
+                                        } else if (i - 0.5 <= avg) {
+                                            starsHtml += '<i class="fa-solid fa-star-half-stroke star-filled"></i>';
+                                        } else {
+                                            starsHtml += '<i class="fa-regular fa-star star-empty"></i>';
+                                        }
+                                    }
+                                    starsDisplay.innerHTML = starsHtml;
+                                }
+                            }
+
+                            if (typeof showToast === 'function') {
+                                showToast('¡Calificación Enviada!', `Has calificado con ${ratingValue} estrella${ratingValue > 1 ? 's' : ''}.`, 'success');
+                            }
+                        } else {
+                            if (typeof showToast === 'function') {
+                                showToast('Error', data.message || 'No se pudo enviar la calificación.', 'error');
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Error al calificar:', err);
+                        if (typeof showToast === 'function') {
+                            showToast('Error de Red', 'No se pudo conectar con el servidor.', 'error');
+                        }
+                    }
+                });
             });
         });
     });

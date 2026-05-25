@@ -69,10 +69,22 @@ const initDb = async () => {
                 imagen_url TEXT,
                 precio_alquiler REAL NOT NULL DEFAULT 3.99,
                 stock INTEGER NOT NULL DEFAULT 5,
+                calificacion REAL DEFAULT 0.0,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         `);
         console.log('Tabla "peliculas" verificada/creada.');
+
+        // Migración de esquema: Agregar calificacion si la tabla ya existía
+        try {
+            await dbRun('ALTER TABLE peliculas ADD COLUMN calificacion REAL DEFAULT 0.0');
+            console.log('Columna "calificacion" agregada de forma segura a "peliculas".');
+        } catch (err) {
+            // El error 'duplicate column name' es normal si la columna ya existía
+            if (!err.message.includes('duplicate column name') && !err.message.includes('already exists')) {
+                console.log('Mensaje durante verificación de columna "calificacion":', err.message);
+            }
+        }
 
         // Crear la tabla de alquileres
         await dbRun(`
@@ -88,6 +100,21 @@ const initDb = async () => {
             )
         `);
         console.log('Tabla "alquileres" verificada/creada.');
+
+        // Crear la tabla de calificaciones individuales
+        await dbRun(`
+            CREATE TABLE IF NOT EXISTS calificaciones (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                usuario_id INTEGER NOT NULL,
+                pelicula_id INTEGER NOT NULL,
+                calificacion REAL NOT NULL CHECK(calificacion >= 1 AND calificacion <= 5),
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(usuario_id) REFERENCES usuarios(id),
+                FOREIGN KEY(pelicula_id) REFERENCES peliculas(id),
+                UNIQUE(usuario_id, pelicula_id)
+            )
+        `);
+        console.log('Tabla "calificaciones" verificada/creada.');
 
 
         // Sembrar usuarios si la base de datos está vacía
@@ -132,7 +159,8 @@ const initDb = async () => {
                     ano: 2010,
                     imagen_url: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600&auto=format&fit=crop',
                     precio_alquiler: 3.99,
-                    stock: 5
+                    stock: 5,
+                    calificacion: 4.8
                 },
                 {
                     titulo: 'Interstellar',
@@ -143,7 +171,8 @@ const initDb = async () => {
                     ano: 2014,
                     imagen_url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop',
                     precio_alquiler: 4.50,
-                    stock: 4
+                    stock: 4,
+                    calificacion: 4.9
                 },
                 {
                     titulo: 'The Matrix',
@@ -154,7 +183,8 @@ const initDb = async () => {
                     ano: 1999,
                     imagen_url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop',
                     precio_alquiler: 2.99,
-                    stock: 7
+                    stock: 7,
+                    calificacion: 4.7
                 },
                 {
                     titulo: 'Parasite',
@@ -165,7 +195,8 @@ const initDb = async () => {
                     ano: 2019,
                     imagen_url: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=600&auto=format&fit=crop',
                     precio_alquiler: 3.99,
-                    stock: 3
+                    stock: 3,
+                    calificacion: 4.6
                 },
                 {
                     titulo: 'Spirited Away',
@@ -176,7 +207,8 @@ const initDb = async () => {
                     ano: 2001,
                     imagen_url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=600&auto=format&fit=crop',
                     precio_alquiler: 3.50,
-                    stock: 6
+                    stock: 6,
+                    calificacion: 4.8
                 },
                 {
                     titulo: 'Pulp Fiction',
@@ -187,14 +219,15 @@ const initDb = async () => {
                     ano: 1994,
                     imagen_url: 'https://images.unsplash.com/photo-1593085512500-5d55148d6f0d?q=80&w=600&auto=format&fit=crop',
                     precio_alquiler: 2.99,
-                    stock: 5
+                    stock: 5,
+                    calificacion: 4.5
                 }
             ];
 
             for (const p of peliculasSemilla) {
                 await dbRun(
-                    `INSERT INTO peliculas (titulo, sinopsis, genero, duracion, director, ano, imagen_url, precio_alquiler, stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                    [p.titulo, p.sinopsis, p.genero, p.duracion, p.director, p.ano, p.imagen_url, p.precio_alquiler, p.stock]
+                    `INSERT INTO peliculas (titulo, sinopsis, genero, duracion, director, ano, imagen_url, precio_alquiler, stock, calificacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    [p.titulo, p.sinopsis, p.genero, p.duracion, p.director, p.ano, p.imagen_url, p.precio_alquiler, p.stock, p.calificacion]
                 );
             }
             console.log('Películas semilla insertadas con éxito.');
@@ -228,6 +261,50 @@ const initDb = async () => {
                 }
             }
             console.log('Alquileres semilla insertados con éxito.');
+        }
+
+        // Asegurar que las películas existentes tengan calificaciones asignadas
+        const ratingsSemilla = [
+            { id: 1, val: 4.8 },
+            { id: 2, val: 4.9 },
+            { id: 3, val: 4.7 },
+            { id: 4, val: 4.6 },
+            { id: 5, val: 4.8 },
+            { id: 6, val: 4.5 }
+        ];
+        for (const r of ratingsSemilla) {
+            await dbRun('UPDATE peliculas SET calificacion = ? WHERE id = ? AND (calificacion IS NULL OR calificacion = 0.0)', [r.val, r.id]);
+        }
+
+        // Sembrar calificaciones individuales de ejemplo
+        const countCalificaciones = await dbGet('SELECT COUNT(*) as count FROM calificaciones');
+        if (countCalificaciones.count === 0) {
+            console.log('Tabla de calificaciones vacía. Sembrando calificaciones semilla...');
+            const calificacionesSemilla = [
+                { usuario_id: 3, pelicula_id: 1, calificacion: 5 },
+                { usuario_id: 3, pelicula_id: 2, calificacion: 5 },
+                { usuario_id: 3, pelicula_id: 3, calificacion: 4 },
+                { usuario_id: 2, pelicula_id: 1, calificacion: 4 },
+                { usuario_id: 2, pelicula_id: 4, calificacion: 5 },
+                { usuario_id: 2, pelicula_id: 5, calificacion: 5 },
+            ];
+            for (const c of calificacionesSemilla) {
+                await dbRun(
+                    'INSERT INTO calificaciones (usuario_id, pelicula_id, calificacion) VALUES (?, ?, ?)',
+                    [c.usuario_id, c.pelicula_id, c.calificacion]
+                );
+            }
+            // Recalcular promedios
+            for (const c of calificacionesSemilla) {
+                const avg = await dbGet(
+                    'SELECT AVG(calificacion) as promedio FROM calificaciones WHERE pelicula_id = ?',
+                    [c.pelicula_id]
+                );
+                if (avg && avg.promedio) {
+                    await dbRun('UPDATE peliculas SET calificacion = ? WHERE id = ?', [Math.round(avg.promedio * 10) / 10, c.pelicula_id]);
+                }
+            }
+            console.log('Calificaciones semilla insertadas con éxito.');
         }
     } catch (err) {
         console.error('Error al inicializar la base de datos:', err);

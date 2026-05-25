@@ -5,6 +5,7 @@ const { initDb } = require('./config/db');
 const viewRoutes = require('./routes/viewRoutes');
 const authRoutes = require('./routes/authRoutes');
 const rentalRoutes = require('./routes/rentalRoutes');
+const ratingRoutes = require('./routes/ratingRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,6 +46,7 @@ app.use((req, res, next) => {
 app.use('/', viewRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/rentals', rentalRoutes);
+app.use('/api/ratings', ratingRoutes);
 
 // Servidor escuchando
 app.listen(PORT, () => {

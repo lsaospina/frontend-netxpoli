@@ -3,6 +3,7 @@ const router = express.Router();
 const Movie = require('../models/Movie');
 const Rental = require('../models/Rental');
 const Report = require('../models/Report');
+const Rating = require('../models/Rating');
 
 
 // Middleware para verificar si el usuario ha iniciado sesión
@@ -52,11 +53,19 @@ router.get('/catalog', requireLogin, async (req, res) => {
     try {
         const movies = await Movie.getAll();
         const genres = await Movie.getGenres();
+        
+        // Obtener calificaciones del usuario actual
+        let userRatings = {};
+        if (req.session.user) {
+            userRatings = await Rating.getUserRatingsMap(req.session.user.id);
+        }
+        
         res.render('catalog', {
             title: 'Catálogo de Películas - CineFlix',
             user: req.session.user,
             movies: movies,
-            genres: genres
+            genres: genres,
+            userRatings: userRatings
         });
     } catch (error) {
         console.error('Error al cargar catálogo:', error);
@@ -90,8 +99,9 @@ const requireManager = (req, res, next) => {
 
 router.get('/reports', requireManager, async (req, res) => {
     try {
-        const [topMovies, summary, byGenre] = await Promise.all([
+        const [topMovies, bestRatedMovies, summary, byGenre] = await Promise.all([
             Report.getMostRented(10),
+            Report.getBestRated(10),
             Report.getSummary(),
             Report.getRentalsByGenre()
         ]);
@@ -99,6 +109,7 @@ router.get('/reports', requireManager, async (req, res) => {
             title: 'Reportes - CineFlix',
             user: req.session.user,
             topMovies,
+            bestRatedMovies,
             summary,
             byGenre
         });

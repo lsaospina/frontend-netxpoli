@@ -88,55 +88,122 @@
 
     <!-- Layout Principal de Reportes -->
     <div class="reports-layout-grid">
-        <!-- Columna Izquierda: Ranking Películas más Vistas -->
+        <!-- Columna Izquierda: Rankings de Películas (Con Pestañas) -->
         <div class="report-section-card">
-            <h3 class="report-section-title">
-                <i class="fa-solid fa-trophy"></i> Películas Más Vistas (Top 10 Alquileres)
-            </h3>
+            <!-- Selector de Pestañas (Tabs) -->
+            <div class="report-tabs-header">
+                <button class="report-tab-btn active" onclick="switchReportTab(event, 'most-rented')">
+                    <i class="fa-solid fa-fire"></i> Películas Más Vistas
+                </button>
+                <button class="report-tab-btn" onclick="switchReportTab(event, 'best-rated')">
+                    <i class="fa-solid fa-star"></i> Películas Mejor Calificadas
+                </button>
+            </div>
             
-            <% if (topMovies && topMovies.length > 0) { %>
-                <div class="ranking-list">
-                    <% topMovies.forEach((movie, index) => { %>
-                        <div class="ranking-item">
-                            <!-- Posición / Podio -->
-                            <div class="ranking-position <%= index === 0 ? 'rank-first' : (index === 1 ? 'rank-second' : (index === 2 ? 'rank-third' : 'rank-rest')) %>">
-                                <%= index + 1 %>
-                            </div>
+            <!-- Contenedor 1: Más Vistas (Top Alquileres) -->
+            <div id="tab-most-rented" class="report-tab-content active">
+                <h3 class="report-section-title" style="border: none; margin-bottom: 0.5rem; padding-bottom: 0;">
+                    <i class="fa-solid fa-trophy"></i> Top 10 Películas Más Alquiladas
+                </h3>
+                
+                <% if (topMovies && topMovies.length > 0) { %>
+                    <div class="ranking-list">
+                        <% topMovies.forEach((movie, index) => { %>
+                            <div class="ranking-item">
+                                <!-- Posición / Podio -->
+                                <div class="ranking-position <%= index === 0 ? 'rank-first' : (index === 1 ? 'rank-second' : (index === 2 ? 'rank-third' : 'rank-rest')) %>">
+                                    <%= index + 1 %>
+                                </div>
 
-                            <!-- Poster Miniatura -->
-                            <div class="ranking-poster">
-                                <img src="<%= movie.imagen_url || 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=100&auto=format&fit=crop' %>" alt="<%= movie.titulo %>">
-                            </div>
+                                <!-- Poster Miniatura -->
+                                <div class="ranking-poster">
+                                    <img src="<%= movie.imagen_url || 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=100&auto=format&fit=crop' %>" alt="<%= movie.titulo %>">
+                                </div>
 
-                            <!-- Detalles de Película -->
-                            <div class="ranking-details">
-                                <span class="ranking-movie-title"><%= movie.titulo %></span>
-                                <div class="ranking-movie-meta">
-                                    <span><i class="fa-solid fa-tag"></i> <%= movie.genero %></span>
-                                    <span><i class="fa-solid fa-user-ninja"></i> <%= movie.director %></span>
-                                    <span><i class="fa-solid fa-cubes"></i> Stock actual: <strong><%= movie.stock %></strong></span>
+                                <!-- Detalles de Película -->
+                                <div class="ranking-details">
+                                    <span class="ranking-movie-title"><%= movie.titulo %></span>
+                                    <div class="ranking-movie-meta">
+                                        <span><i class="fa-solid fa-tag"></i> <%= movie.genero %></span>
+                                        <span><i class="fa-solid fa-user-ninja"></i> <%= movie.director %></span>
+                                        <span><i class="fa-solid fa-cubes"></i> Stock: <strong><%= movie.stock %></strong></span>
+                                        <% if (movie.calificacion > 0) { %>
+                                            <span class="rating-star-badge" style="transform: scale(0.85); transform-origin: left center; margin: -5px 0;"><i class="fa-solid fa-star"></i> <%= movie.calificacion.toFixed(1) %></span>
+                                        <% } %>
+                                    </div>
+                                </div>
+
+                                <!-- Estadísticas de Alquiler -->
+                                <div class="ranking-stats">
+                                    <div class="ranking-stat-block">
+                                        <span class="ranking-stat-label">Alquileres</span>
+                                        <span class="ranking-stat-count"><%= movie.total_alquileres %></span>
+                                    </div>
+                                    <div class="ranking-stat-block">
+                                        <span class="ranking-stat-label">Ingresos</span>
+                                        <span class="ranking-stat-income">$<%= Number(movie.ingresos_generados || 0).toFixed(2) %></span>
+                                    </div>
                                 </div>
                             </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <p style="color: var(--text-muted); text-align: center; padding: 2rem 0;">
+                        No hay suficientes datos de alquiler registrados para generar este ranking.
+                    </p>
+                <% } %>
+            </div>
 
-                            <!-- Estadísticas de Alquiler -->
-                            <div class="ranking-stats">
-                                <div class="ranking-stat-block">
-                                    <span class="ranking-stat-label">Alquileres</span>
-                                    <span class="ranking-stat-count"><%= movie.total_alquileres %></span>
+            <!-- Contenedor 2: Mejor Calificadas (Rating) -->
+            <div id="tab-best-rated" class="report-tab-content">
+                <h3 class="report-section-title" style="border: none; margin-bottom: 0.5rem; padding-bottom: 0;">
+                    <i class="fa-solid fa-star"></i> Películas con Mejor Valoración de Usuarios
+                </h3>
+                
+                <% if (bestRatedMovies && bestRatedMovies.length > 0) { %>
+                    <div class="ranking-list">
+                        <% bestRatedMovies.forEach((movie, index) => { %>
+                            <div class="ranking-item">
+                                <!-- Posición / Podio -->
+                                <div class="ranking-position <%= index === 0 ? 'rank-first' : (index === 1 ? 'rank-second' : (index === 2 ? 'rank-third' : 'rank-rest')) %>">
+                                    <%= index + 1 %>
                                 </div>
-                                <div class="ranking-stat-block">
-                                    <span class="ranking-stat-label">Ingresos</span>
-                                    <span class="ranking-stat-income">$<%= Number(movie.ingresos_generados || 0).toFixed(2) %></span>
+
+                                <!-- Poster Miniatura -->
+                                <div class="ranking-poster">
+                                    <img src="<%= movie.imagen_url || 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=100&auto=format&fit=crop' %>" alt="<%= movie.titulo %>">
+                                </div>
+
+                                <!-- Detalles de Película -->
+                                <div class="ranking-details">
+                                    <span class="ranking-movie-title"><%= movie.titulo %></span>
+                                    <div class="ranking-movie-meta">
+                                        <span><i class="fa-solid fa-tag"></i> <%= movie.genero %></span>
+                                        <span><i class="fa-solid fa-user-ninja"></i> <%= movie.director %></span>
+                                        <span><i class="fa-solid fa-cubes"></i> Stock: <strong><%= movie.stock %></strong></span>
+                                        <span><i class="fa-solid fa-tags"></i> Renta: <strong>$<%= Number(movie.precio_alquiler).toFixed(2) %></strong></span>
+                                    </div>
+                                </div>
+
+                                <!-- Estadísticas de Calificación -->
+                                <div class="ranking-stats">
+                                    <div class="ranking-stat-block">
+                                        <span class="ranking-stat-label">Valoración</span>
+                                        <span class="ranking-stat-rating">
+                                            <i class="fa-solid fa-star" style="font-size: 1rem;"></i> 
+                                            <%= movie.calificacion.toFixed(1) %>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    <% }); %>
-                </div>
-            <% } else { %>
-                <p style="color: var(--text-muted); text-align: center; padding: 2rem 0;">
-                    No hay suficientes datos de alquiler registrados para generar un ranking.
-                </p>
-            <% } %>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <p style="color: var(--text-muted); text-align: center; padding: 2rem 0;">
+                        No hay suficientes calificaciones registradas en el catálogo.
+                    </p>
+                <% } %>
+            </div>
         </div>
 
         <!-- Columna Derecha: Estadísticas por Género y Destacado -->
@@ -202,5 +269,36 @@
         </div>
     </div>
 </div>
+
+<!-- Lógica de Control para Alternar Pestañas en Tiempo Real -->
+<script>
+    function switchReportTab(event, tabName) {
+        // Evitar comportamientos por defecto del botón
+        if (event) event.preventDefault();
+
+        // 1. Desactivar todos los botones de pestañas
+        const buttons = document.querySelectorAll('.report-tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        // 2. Ocultar todos los contenidos de pestañas
+        const contents = document.querySelectorAll('.report-tab-content');
+        contents.forEach(content => content.classList.remove('active'));
+
+        // 3. Activar el botón presionado
+        if (event) {
+            event.currentTarget.classList.add('active');
+        } else {
+            // Caso por defecto en arranque sin evento
+            const defaultBtn = Array.from(buttons).find(btn => btn.getAttribute('onclick').includes(tabName));
+            if (defaultBtn) defaultBtn.classList.add('active');
+        }
+
+        // 4. Mostrar el contenido de la pestaña correspondiente
+        const targetContent = document.getElementById('tab-' + tabName);
+        if (targetContent) {
+            targetContent.classList.add('active');
+        }
+    }
+</script>
 
 <%- include('partials/footer') %>
