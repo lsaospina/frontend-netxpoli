@@ -1,0 +1,94 @@
+<%- include('partials/header') %>
+
+<div class="auth-card">
+    <div class="auth-card-header">
+        <h2 class="auth-card-title">Crear Cuenta</h2>
+        <p class="auth-card-subtitle">Regístrate gratis para rentar tus películas favoritas</p>
+    </div>
+
+    <form id="register-form">
+        <!-- Nombre y Apellido en una fila -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input 
+                    type="text" 
+                    id="nombre" 
+                    class="form-input" 
+                    placeholder="Juan" 
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="apellido" class="form-label">Apellido</label>
+                <input 
+                    type="text" 
+                    id="apellido" 
+                    class="form-input" 
+                    placeholder="Pérez" 
+                    required
+                >
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="username" class="form-label">Nombre de Usuario</label>
+            <input 
+                type="text" 
+                id="username" 
+                class="form-input" 
+                placeholder="juanperez" 
+                required 
+                autocomplete="username"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="email" class="form-label">Correo Electrónico</label>
+            <input 
+                type="email" 
+                id="email" 
+                class="form-input" 
+                placeholder="correo@ejemplo.com" 
+                required 
+                autocomplete="email"
+            >
+        </div>
+
+        <!-- Contraseña y confirmación en una fila -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="password" class="form-label">Contraseña</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    class="form-input" 
+                    placeholder="••••••••" 
+                    required 
+                    autocomplete="new-password"
+                >
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword" class="form-label">Confirmar</label>
+                <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    class="form-input" 
+                    placeholder="••••••••" 
+                    required 
+                    autocomplete="new-password"
+                >
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">
+            <i class="fa-solid fa-user-plus"></i> Crear Cuenta
+        </button>
+    </form>
+
+    <div class="auth-switch">
+        ¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

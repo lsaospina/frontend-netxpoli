@@ -1,0 +1,120 @@
+<%- include('partials/header') %>
+
+<div class="dashboard-container">
+    <!-- Banner de bienvenida -->
+    <div class="welcome-banner">
+        <div class="welcome-text">
+            <h2>¡Hola, <%= user.nombre %> <%= user.apellido %>!</h2>
+            <p>Bienvenido al panel del sistema de alquiler de películas.</p>
+        </div>
+        <div>
+            <div class="user-badge <%= user.tipo_usuario %>">
+                <% if (user.tipo_usuario === 'administrador') { %>
+                    <i class="fa-solid fa-user-shield"></i> Administrador
+                <% } else if (user.tipo_usuario === 'gerente') { %>
+                    <i class="fa-solid fa-user-tie"></i> Gerente
+                <% } else { %>
+                    <i class="fa-solid fa-user"></i> Cliente
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Título de sección de acuerdo al rol -->
+    <h3 style="margin: 2rem 0 1rem 0; font-size: 1.6rem; color: var(--text-main);">
+        Acciones Disponibles para tu Rol
+    </h3>
+
+    <!-- Grid de tarjetas de características de acuerdo al rol del usuario -->
+    <div class="features-grid">
+        <% if (user.tipo_usuario === 'cliente') { %>
+            <!-- Tarjetas de Cliente -->
+            <div class="feature-card role-accent-cliente">
+                <div class="feature-icon" style="color: var(--color-cliente);">
+                    <i class="fa-solid fa-compact-disc"></i>
+                </div>
+                <h4 class="feature-title">Explorar Cartelera</h4>
+                <p class="feature-desc">Navega por nuestro catálogo de películas de estreno, acción, comedia, terror y clásicos de culto disponibles para alquiler.</p>
+                <a href="#" class="feature-action-btn">Ver Catálogo</a>
+            </div>
+
+            <div class="feature-card role-accent-cliente">
+                <div class="feature-icon" style="color: var(--color-cliente);">
+                    <i class="fa-solid fa-ticket"></i>
+                </div>
+                <h4 class="feature-title">Mis Alquileres</h4>
+                <p class="feature-desc">Revisa tus películas rentadas activas, fechas de devolución, y reproduce tus películas directamente en línea.</p>
+                <a href="#" class="feature-action-btn">Ver Alquileres</a>
+            </div>
+
+            <div class="feature-card role-accent-cliente">
+                <div class="feature-icon" style="color: var(--color-cliente);">
+                    <i class="fa-solid fa-credit-card"></i>
+                </div>
+                <h4 class="feature-title">Método de Pago</h4>
+                <p class="feature-desc">Gestiona tus tarjetas de crédito, saldo de CineFlix, y revisa el historial de transacciones anteriores.</p>
+                <a href="#" class="feature-action-btn">Configurar Pagos</a>
+            </div>
+
+        <% } else if (user.tipo_usuario === 'gerente') { %>
+            <!-- Tarjetas de Gerente -->
+            <div class="feature-card role-accent-gerente">
+                <div class="feature-icon" style="color: var(--color-gerente);">
+                    <i class="fa-solid fa-tags"></i>
+                </div>
+                <h4 class="feature-title">Inventario de Películas</h4>
+                <p class="feature-desc">Agrega nuevos títulos a la cartelera, ajusta precios de alquiler, edita stock y define películas en oferta especial.</p>
+                <a href="#" class="feature-action-btn">Ir a Catálogo</a>
+            </div>
+
+            <div class="feature-card role-accent-gerente">
+                <div class="feature-icon" style="color: var(--color-gerente);">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <h4 class="feature-title">Reportes y Estadísticas</h4>
+                <p class="feature-desc">Visualiza las películas más rentadas de la semana, ingresos acumulados y horas de mayor consumo de películas.</p>
+                <a href="#" class="feature-action-btn">Ver Reportes</a>
+            </div>
+
+            <div class="feature-card role-accent-gerente">
+                <div class="feature-icon" style="color: var(--color-gerente);">
+                    <i class="fa-solid fa-percent"></i>
+                </div>
+                <h4 class="feature-title">Descuentos y Promos</h4>
+                <p class="feature-desc">Crea cupones de descuento especiales para los clientes recurrentes e implementa promociones de fin de semana.</p>
+                <a href="#" class="feature-action-btn">Gestionar Cupones</a>
+            </div>
+
+        <% } else if (user.tipo_usuario === 'administrador') { %>
+            <!-- Tarjetas de Administrador -->
+            <div class="feature-card role-accent-administrador">
+                <div class="feature-icon" style="color: var(--color-admin);">
+                    <i class="fa-solid fa-users-gear"></i>
+                </div>
+                <h4 class="feature-title">Gestión de Usuarios</h4>
+                <p class="feature-desc">Edita la información de los usuarios registrados, cambia contraseñas y promueve clientes a Gerentes o Administradores.</p>
+                <a href="#" class="feature-action-btn">Ver Usuarios</a>
+            </div>
+
+            <div class="feature-card role-accent-administrador">
+                <div class="feature-icon" style="color: var(--color-admin);">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h4 class="feature-title">Logs de Auditoría</h4>
+                <p class="feature-desc">Revisa el registro de auditoría del sistema para ver quién realizó cambios en el inventario o eliminó usuarios del sistema.</p>
+                <a href="#" class="feature-action-btn">Ver Historial</a>
+            </div>
+
+            <div class="feature-card role-accent-administrador">
+                <div class="feature-icon" style="color: var(--color-admin);">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <h4 class="feature-title">Mantenimiento de BD</h4>
+                <p class="feature-desc">Realiza copias de seguridad de la base de datos SQLite y optimiza los índices de búsqueda del sistema.</p>
+                <a href="#" class="feature-action-btn">Mantenimiento BD</a>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

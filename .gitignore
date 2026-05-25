@@ -1,0 +1,29 @@
+# Dependency directories
+node_modules/
+
+# SQLite databases & temp files
+database.sqlite
+*.sqlite-journal
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# IDEs & System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Agent skills & configs
+.agents/
+skills-lock.json

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'CineFlix - Alquiler de Películas' %></title>
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Iconos FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo-brand">
+                <i class="fa-solid fa-film"></i> Cine<span>Flix</span>
+            </a>
+            
+            <nav class="nav-menu">
+                <% if (user) { %>
+                    <a href="/dashboard" class="nav-link"><i class="fa-solid fa-house"></i> Inicio</a>
+                    
+                    <% if (user.tipo_usuario === 'cliente') { %>
+                        <a href="#" class="nav-link"><i class="fa-solid fa-compact-disc"></i> Catálogo</a>
+                        <a href="#" class="nav-link"><i class="fa-solid fa-ticket"></i> Mis Alquileres</a>
+                    <% } else if (user.tipo_usuario === 'gerente') { %>
+                        <a href="#" class="nav-link"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+                        <a href="#" class="nav-link"><i class="fa-solid fa-tags"></i> Gestionar Catálogo</a>
+                    <% } else if (user.tipo_usuario === 'administrador') { %>
+                        <a href="#" class="nav-link"><i class="fa-solid fa-users-gear"></i> Usuarios</a>
+                        <a href="#" class="nav-link"><i class="fa-solid fa-film"></i> Películas</a>
+                        <a href="#" class="nav-link"><i class="fa-solid fa-sliders"></i> Ajustes</a>
+                    <% } %>
+
+                    <a href="/api/auth/logout" class="btn-nav-action"><i class="fa-solid fa-right-from-bracket"></i> Salir</a>
+                <% } else { %>
+                    <a href="/login" class="nav-link">Entrar</a>
+                    <a href="/register" class="btn-nav-action">Registrarse</a>
+                <% } %>
+            </nav>
+        </div>
+    </header>
+    <main>
