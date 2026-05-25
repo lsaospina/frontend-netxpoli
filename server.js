@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Configuración de sesiones
 app.use(session({
-    secret: 'cineflix_ultra_secret_key_987654321', // Llave secreta para firmar las cookies de sesión
+    secret: 'netpolix_ultra_secret_key_987654321', // Llave secreta para firmar las cookies de sesión
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -47,7 +47,7 @@ app.use('/api/auth', authRoutes);
 // Servidor escuchando
 app.listen(PORT, () => {
     console.log(`====================================================`);
-    console.log(` Servidor de CineFlix corriendo en puerto ${PORT}`);
+    console.log(` Servidor de NetPolix corriendo en puerto ${PORT}`);
     console.log(` Visita: http://localhost:${PORT}`);
     console.log(`====================================================`);
 });

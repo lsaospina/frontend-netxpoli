@@ -1,5 +1,5 @@
 /**
- * CineFlix - Funcionalidad del Cliente
+ * NetPolix - Funcionalidad del Cliente
  * Control de formularios AJAX, validación y notificaciones Toast
  */
 

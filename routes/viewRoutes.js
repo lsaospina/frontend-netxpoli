@@ -27,18 +27,18 @@ router.get('/', (req, res) => {
 
 // Vista de Login
 router.get('/login', redirectIfLoggedIn, (req, res) => {
-    res.render('login', { title: 'Iniciar Sesión - CineFlix' });
+    res.render('login', { title: 'Iniciar Sesión - NetPolix' });
 });
 
 // Vista de Registro
 router.get('/register', redirectIfLoggedIn, (req, res) => {
-    res.render('register', { title: 'Registrarse - CineFlix' });
+    res.render('register', { title: 'Registrarse - NetPolix' });
 });
 
 // Vista de Dashboard (protegida)
 router.get('/dashboard', requireLogin, (req, res) => {
     res.render('dashboard', { 
-        title: 'Panel de Control - CineFlix',
+        title: 'Panel de Control - NetPolix',
         user: req.session.user 
     });
 });

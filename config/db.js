@@ -68,17 +68,17 @@ const initDb = async () => {
 
             await dbRun(
                 `INSERT INTO usuarios (username, email, password, nombre, apellido, tipo_usuario) VALUES (?, ?, ?, ?, ?, ?)`,
-                ['admin', 'admin@cine.com', adminPass, 'Carlos', 'Administrador', 'administrador']
+                ['admin', 'admin@netpolix.com', adminPass, 'Carlos', 'Administrador', 'administrador']
             );
             
             await dbRun(
                 `INSERT INTO usuarios (username, email, password, nombre, apellido, tipo_usuario) VALUES (?, ?, ?, ?, ?, ?)`,
-                ['gerente', 'gerente@cine.com', gerentePass, 'Sofía', 'Gerente', 'gerente']
+                ['gerente', 'gerente@netpolix.com', gerentePass, 'Sofía', 'Gerente', 'gerente']
             );
             
             await dbRun(
                 `INSERT INTO usuarios (username, email, password, nombre, apellido, tipo_usuario) VALUES (?, ?, ?, ?, ?, ?)`,
-                ['cliente', 'cliente@cine.com', clientePass, 'Juan', 'Cliente', 'cliente']
+                ['cliente', 'cliente@netpolix.com', clientePass, 'Juan', 'Cliente', 'cliente']
             );
 
             console.log('Usuarios semilla insertados con éxito.');
