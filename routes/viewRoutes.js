@@ -134,4 +134,29 @@ router.get('/reports', requireManager, async (req, res) => {
     }
 });
 
+// Vista de Gestión de Películas (solo administrador)
+const requireAdmin = (req, res, next) => {
+    if (!req.session || !req.session.user) return res.redirect('/login');
+    if (req.session.user.tipo_usuario !== 'administrador') {
+        return res.redirect('/dashboard');
+    }
+    next();
+};
+
+router.get('/admin/movies', requireAdmin, async (req, res) => {
+    try {
+        const movies = await Movie.getAll();
+        const genres = await Movie.getGenres();
+        res.render('admin-movies', {
+            title: 'Gestión de Películas - NetPolix',
+            user: req.session.user,
+            movies: movies,
+            genres: genres
+        });
+    } catch (error) {
+        console.error('Error al cargar administración de películas:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
 module.exports = router;

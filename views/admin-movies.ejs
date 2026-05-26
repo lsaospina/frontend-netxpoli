@@ -1,0 +1,293 @@
+<%- include('partials/header') %>
+
+<div class="admin-container">
+    <!-- Encabezado de la página de administración -->
+    <div class="admin-header-actions">
+        <div class="admin-title-section">
+            <h1><i class="fa-solid fa-film"></i> Gestión de Inventario</h1>
+            <p>Monitorea y administra el catálogo de películas disponibles para alquiler.</p>
+        </div>
+        <button id="btn-open-add-modal" class="btn-admin-action">
+            <i class="fa-solid fa-plus"></i> Agregar Película
+        </button>
+    </div>
+
+    <!-- Tabla/Lista de Películas -->
+    <div class="admin-table-card">
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Película</th>
+                        <th>Género</th>
+                        <th>Año / Duración</th>
+                        <th>Precio Alquiler</th>
+                        <th>Inventario (Stock)</th>
+                        <th>Calificación Promedio</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-movies-tbody">
+                    <% if (movies && movies.length > 0) { %>
+                        <% movies.forEach(function(movie) { %>
+                            <tr data-movie-id="<%= movie.id %>">
+                                <td>
+                                    <div class="table-movie-info">
+                                        <img class="table-movie-poster" src="<%= movie.imagen_url %>" alt="<%= movie.titulo %>" loading="lazy">
+                                        <div class="table-movie-details">
+                                            <span class="table-movie-title"><%= movie.titulo %></span>
+                                            <span class="table-movie-director">Dir: <%= movie.director %></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="genre-tag"><%= movie.genero %></span>
+                                </td>
+                                <td>
+                                    <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+                                        <span><%= movie.ano %></span>
+                                        <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-regular fa-clock"></i> <%= movie.duracion %> min</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="price-tag-value">$<%= movie.precio_alquiler.toFixed(2) %></span>
+                                </td>
+                                <td>
+                                    <span class="stock-badge <%= movie.stock > 0 ? 'in-stock' : 'out-of-stock' %>">
+                                        <%= movie.stock > 0 ? movie.stock + ' disp.' : 'Agotado' %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--color-gold);">
+                                        <i class="fa-solid fa-star"></i>
+                                        <span><%= movie.calificacion ? movie.calificacion.toFixed(1) : '0.0' %></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                                <i class="fa-solid fa-video-slash" style="font-size: 2.5rem; margin-bottom: 1rem; display: block; color: rgba(255,255,255,0.1);"></i>
+                                No hay películas registradas en el catálogo. ¡Agrega una nueva!
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Agregar Película -->
+<div id="add-movie-modal" class="admin-modal">
+    <div class="admin-modal-content">
+        <button id="btn-close-add-modal" class="admin-modal-close-btn">&times;</button>
+        
+        <div class="admin-modal-header">
+            <h2>Agregar Nueva Película</h2>
+            <p>Ingresa los detalles cinematográficos para el nuevo registro en catálogo</p>
+        </div>
+
+        <div class="admin-modal-body">
+            <form id="add-movie-form" autocomplete="off">
+                <!-- Fila 1: Título -->
+                <div class="form-group">
+                    <label for="titulo" class="form-label">Título de la Película *</label>
+                    <input type="text" id="titulo" class="form-input" placeholder="Ej. El Origen" required>
+                </div>
+
+                <!-- Fila 2: Género y Director -->
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="genero" class="form-label">Género *</label>
+                        <input type="text" id="genero" class="form-input" list="genres-list" placeholder="Selecciona o escribe" required>
+                        <datalist id="genres-list">
+                            <% genres.forEach(function(g) { %>
+                                <option value="<%= g %>"></option>
+                            <% }); %>
+                            <option value="Acción"></option>
+                            <option value="Aventura"></option>
+                            <option value="Ciencia Ficción"></option>
+                            <option value="Comedia"></option>
+                            <option value="Drama"></option>
+                            <option value="Fantasía"></option>
+                            <option value="Suspenso"></option>
+                            <option value="Terror"></option>
+                            <option value="Romance"></option>
+                            <option value="Documental"></option>
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="director" class="form-label">Director</label>
+                        <input type="text" id="director" class="form-input" placeholder="Ej. Christopher Nolan">
+                    </div>
+                </div>
+
+                <!-- Fila 3: Año y Duración -->
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="ano" class="form-label">Año de Lanzamiento *</label>
+                        <input type="number" id="ano" class="form-input" min="1888" max="2035" placeholder="Ej. 2010" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="duracion" class="form-label">Duración (minutos) *</label>
+                        <input type="number" id="duracion" class="form-input" min="1" max="999" placeholder="Ej. 148" required>
+                    </div>
+                </div>
+
+                <!-- Fila 4: Precio Alquiler y Stock -->
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="precio_alquiler" class="form-label">Precio de Alquiler ($) *</label>
+                        <input type="number" id="precio_alquiler" class="form-input" min="0.00" step="0.01" placeholder="Ej. 3.99" value="3.99" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stock" class="form-label">Copias Disponibles (Stock) *</label>
+                        <input type="number" id="stock" class="form-input" min="0" step="1" placeholder="Ej. 5" value="5" required>
+                    </div>
+                </div>
+
+                <!-- Fila 5: URL de la Imagen -->
+                <div class="form-group">
+                    <label for="imagen_url" class="form-label">URL del Póster (Imagen) </label>
+                    <input type="url" id="imagen_url" class="form-input" placeholder="https://ejemplo.com/poster.jpg">
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Dejar vacío para usar póster por defecto de la aplicación.</p>
+                </div>
+
+                <!-- Fila 6: Sinopsis -->
+                <div class="form-group">
+                    <label for="sinopsis" class="form-label">Sinopsis / Resumen</label>
+                    <textarea id="sinopsis" class="form-textarea" placeholder="Escribe un breve resumen de la trama de la película..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Registrar Película
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Elemento Toast para Notificaciones -->
+<div id="toast-container" class="toast-alert">
+    <i id="toast-icon" class="fa-solid"></i>
+    <span id="toast-message"></span>
+</div>
+
+<!-- Script del Módulo de Administración -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const addModal = document.getElementById('add-movie-modal');
+    const openModalBtn = document.getElementById('btn-open-add-modal');
+    const closeModalBtn = document.getElementById('btn-close-add-modal');
+    const addForm = document.getElementById('add-movie-form');
+    
+    // Toast elements
+    const toast = document.getElementById('toast-container');
+    const toastIcon = document.getElementById('toast-icon');
+    const toastMsg = document.getElementById('toast-message');
+
+    // Función para mostrar alertas tipo Toast
+    function showToast(message, type = 'success') {
+        toast.className = 'toast-alert show';
+        
+        if (type === 'success') {
+            toast.classList.add('success');
+            toastIcon.className = 'fa-solid fa-circle-check';
+            toastIcon.style.color = 'var(--text-success)';
+        } else {
+            toast.classList.add('error');
+            toastIcon.className = 'fa-solid fa-circle-exclamation';
+            toastIcon.style.color = 'var(--text-error)';
+        }
+        
+        toastMsg.textContent = message;
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3500);
+    }
+
+    // Eventos del Modal
+    openModalBtn.addEventListener('click', () => {
+        addModal.classList.add('open');
+        document.body.style.overflow = 'hidden'; // Evita scroll de fondo
+    });
+
+    const closeModal = () => {
+        addModal.classList.remove('open');
+        document.body.style.overflow = 'auto'; // Restaura scroll de fondo
+        addForm.reset();
+        // Restablecer valores predeterminados
+        document.getElementById('precio_alquiler').value = "3.99";
+        document.getElementById('stock').value = "5";
+    };
+
+    closeModalBtn.addEventListener('click', closeModal);
+    
+    // Cerrar modal al hacer click fuera
+    addModal.addEventListener('click', (e) => {
+        if (e.target === addModal) {
+            closeModal();
+        }
+    });
+
+    // Envío del Formulario
+    addForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Obtener datos
+        const titulo = document.getElementById('titulo').value;
+        const genero = document.getElementById('genero').value;
+        const director = document.getElementById('director').value;
+        const ano = document.getElementById('ano').value;
+        const duracion = document.getElementById('duracion').value;
+        const precio_alquiler = document.getElementById('precio_alquiler').value;
+        const stock = document.getElementById('stock').value;
+        const imagen_url = document.getElementById('imagen_url').value;
+        const sinopsis = document.getElementById('sinopsis').value;
+
+        // Construir JSON
+        const movieData = {
+            titulo,
+            genero,
+            director,
+            ano,
+            duracion,
+            precio_alquiler,
+            stock,
+            imagen_url,
+            sinopsis
+        };
+
+        try {
+            const response = await fetch('/api/movies', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(movieData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                showToast(result.message, 'success');
+                closeModal();
+                
+                // Recargar página después de mostrar el mensaje de éxito para reflejar los cambios
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                showToast(result.message || 'Error al agregar la película.', 'error');
+            }
+        } catch (error) {
+            console.error('Error al enviar datos:', error);
+            showToast('Error de conexión con el servidor.', 'error');
+        }
+    });
+});
+</script>
+
+<%- include('partials/footer') %>

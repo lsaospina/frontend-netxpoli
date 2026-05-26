@@ -6,6 +6,7 @@ const viewRoutes = require('./routes/viewRoutes');
 const authRoutes = require('./routes/authRoutes');
 const rentalRoutes = require('./routes/rentalRoutes');
 const ratingRoutes = require('./routes/ratingRoutes');
+const movieRoutes = require('./routes/movieRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -47,6 +48,7 @@ app.use('/', viewRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/rentals', rentalRoutes);
 app.use('/api/ratings', ratingRoutes);
+app.use('/api/movies', movieRoutes);
 
 // Servidor escuchando
 app.listen(PORT, () => {
