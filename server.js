@@ -51,7 +51,7 @@ app.use('/api/ratings', ratingRoutes);
 // Servidor escuchando
 app.listen(PORT, () => {
     console.log(`====================================================`);
-    console.log(` Servidor de CineFlix corriendo en puerto ${PORT}`);
+    console.log(` Servidor de NetPolix corriendo en puerto ${PORT}`);
     console.log(` Visita: http://localhost:${PORT}`);
     console.log(`====================================================`);
 });

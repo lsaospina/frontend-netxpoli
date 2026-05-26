@@ -111,9 +111,9 @@ a {
 main {
     flex: 1;
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Permite que el contenido fluya de arriba a abajo de forma natural */
     justify-content: center;
-    padding: 2rem;
+    padding: 2rem 1rem;
     position: relative;
     z-index: 1;
 }
@@ -201,6 +201,7 @@ header {
     padding: 3rem 2.5rem;
     box-shadow: var(--shadow-cinematic);
     animation: fadeInScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    align-self: center; /* Centra verticalmente la tarjeta de login/registro en pantallas grandes */
 }
 
 @keyframes fadeInScale {
@@ -2536,4 +2537,238 @@ footer p span {
 
 .star-input-group .star-btn.active {
     animation: starPop 0.3s ease;
+}
+
+/* ==========================================================================
+   Sistema de Referidos Premium
+   ========================================================================== */
+
+.referral-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(5, 5, 6, 0.96);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 2rem;
+    animation: fadeIn 0.4s ease forwards;
+}
+
+.referral-modal.open {
+    display: flex;
+}
+
+.referral-modal-content {
+    background: var(--bg-card-glass);
+    border: 1px solid var(--border-glass);
+    box-shadow: var(--shadow-cinematic), 0 0 50px rgba(50, 205, 50, 0.05);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 500px;
+    padding: 2.5rem;
+    position: relative;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.referral-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    line-height: 1;
+}
+
+.referral-close-btn:hover {
+    color: var(--text-main);
+}
+
+.referral-modal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.referral-modal-icon-glow {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(50, 205, 50, 0.1);
+    border: 2px solid var(--color-cliente);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    color: var(--color-cliente);
+    box-shadow: 0 0 20px rgba(50, 205, 50, 0.3);
+    margin-bottom: 0.5rem;
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+.referral-modal-header h2 {
+    font-family: var(--font-display);
+    color: var(--text-main);
+    font-size: 1.8rem;
+}
+
+.referral-modal-header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.referral-instructions {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+}
+
+.referral-link-container {
+    display: flex;
+    background: rgba(8, 8, 10, 0.9);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    padding: 4px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.referral-link-container:focus-within {
+    border-color: var(--color-cliente);
+    box-shadow: 0 0 10px rgba(50, 205, 50, 0.2);
+}
+
+#referral-link-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    outline: none;
+    width: 100%;
+}
+
+.btn-copy-link {
+    background: var(--color-cliente);
+    border: none;
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 600;
+    padding: 0 1.25rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-copy-link:hover {
+    background: #2ebd2e;
+    box-shadow: 0 0 10px rgba(50, 205, 50, 0.3);
+}
+
+.referral-stats-mini {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 1.5rem;
+}
+
+.referral-stats-mini .stat-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.referral-stats-mini .stat-num {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-cliente);
+    text-shadow: 0 0 10px rgba(50, 205, 50, 0.2);
+}
+
+.referral-stats-mini .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Banner de Referido en Registro */
+.referral-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(50, 205, 50, 0.04);
+    border: 1px solid rgba(50, 205, 50, 0.25);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(50, 205, 50, 0.02);
+}
+
+.referral-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--color-cliente);
+}
+
+.referral-banner-icon {
+    font-size: 1.5rem;
+    color: var(--color-cliente);
+    filter: drop-shadow(0 0 5px rgba(50, 205, 50, 0.4));
+    animation: bounce 2s infinite;
+}
+
+.referral-banner-text {
+    font-size: 0.9rem;
+    color: var(--text-main);
+    line-height: 1.4;
+}
+
+.referral-banner-text strong {
+    color: var(--color-cliente);
+    text-shadow: 0 0 5px rgba(50, 205, 50, 0.1);
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(50, 205, 50, 0.3);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(50, 205, 50, 0.5);
+        transform: scale(1.05);
+    }
 }

@@ -44,7 +44,7 @@
                 </div>
                 <h4 class="feature-title">Mis Alquileres</h4>
                 <p class="feature-desc">Revisa tus películas rentadas activas, fechas de devolución, y reproduce tus películas directamente en línea.</p>
-                <a href="#" class="feature-action-btn">Ver Alquileres</a>
+                <a href="/rentals" class="feature-action-btn">Ver Alquileres</a>
             </div>
 
             <div class="feature-card role-accent-cliente">
@@ -52,8 +52,23 @@
                     <i class="fa-solid fa-credit-card"></i>
                 </div>
                 <h4 class="feature-title">Método de Pago</h4>
-                <p class="feature-desc">Gestiona tus tarjetas de crédito, saldo de CineFlix, y revisa el historial de transacciones anteriores.</p>
+                <p class="feature-desc">Gestiona tus tarjetas de crédito, saldo de NetPolix, y revisa el historial de transacciones anteriores.</p>
                 <a href="#" class="feature-action-btn">Configurar Pagos</a>
+            </div>
+
+            <div class="feature-card role-accent-cliente">
+                <div class="feature-icon" style="color: var(--color-cliente);">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <h4 class="feature-title">Refiere y Gana</h4>
+                <p class="feature-desc">Invita a tus amigos a unirse a NetPolix y obtén $5.00 de saldo por cada amigo que se registre con tu enlace.</p>
+                <div class="referral-mini-counter" style="margin-top: auto; font-size: 0.9rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; width: 100%; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; margin-bottom: 0.75rem;">
+                    <span>Amigos referidos:</span>
+                    <strong style="color: var(--color-cliente); font-size: 1.1rem;"><%= typeof referredCount !== 'undefined' ? referredCount : 0 %></strong>
+                </div>
+                <button class="feature-action-btn" id="btn-referral" data-username="<%= user.username %>" style="border: none; cursor: pointer; width: 100%; font-family: var(--font-body); background: linear-gradient(135deg, var(--color-cliente), rgba(50, 205, 50, 0.7)); color: #fff; font-weight: 500;">
+                    <i class="fa-solid fa-gift"></i> Obtener Enlace
+                </button>
             </div>
 
         <% } else if (user.tipo_usuario === 'gerente') { %>
@@ -114,6 +129,45 @@
                 <a href="#" class="feature-action-btn">Mantenimiento BD</a>
             </div>
         <% } %>
+    </div>
+</div>
+
+<!-- Modal de Referidos Premium -->
+<div id="referral-modal" class="referral-modal">
+    <div class="referral-modal-content">
+        <button id="referral-close" class="referral-close-btn">&times;</button>
+        
+        <div class="referral-modal-header">
+            <div class="referral-modal-icon-glow">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <h2>Refiere y Gana</h2>
+            <p>Comparte la experiencia NetPolix y gana saldo</p>
+        </div>
+
+        <div class="referral-modal-body">
+            <p class="referral-instructions">
+                Copia tu enlace de invitación y compártelo. Por cada amigo que se registre con tu enlace, ¡ambos recibirán un bono de saldo en su cuenta de NetPolix de forma gratuita!
+            </p>
+            
+            <div class="referral-link-container">
+                <input type="text" id="referral-link-input" readonly value="" placeholder="Generando enlace...">
+                <button id="btn-copy-referral" class="btn-copy-link">
+                    <i class="fa-solid fa-copy"></i> Copiar
+                </button>
+            </div>
+            
+            <div class="referral-stats-mini">
+                <div class="stat-item">
+                    <span class="stat-num"><%= typeof referredCount !== 'undefined' ? referredCount : 0 %></span>
+                    <span class="stat-label">Amigos Registrados</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">$<%= (typeof referredCount !== 'undefined' ? referredCount : 0) * 5 %>.00</span>
+                    <span class="stat-label">Saldo Acumulado</span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

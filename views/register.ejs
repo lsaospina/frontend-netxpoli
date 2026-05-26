@@ -6,7 +6,19 @@
         <p class="auth-card-subtitle">Regístrate gratis para rentar tus películas favoritas</p>
     </div>
 
+    <% if (ref) { %>
+        <div class="referral-banner animate-glow">
+            <div class="referral-banner-icon">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <div class="referral-banner-text">
+                ¡Te ha invitado <strong><%= ref %></strong>! Recibirás saldo de regalo al completar tu registro.
+            </div>
+        </div>
+    <% } %>
+
     <form id="register-form">
+        <input type="hidden" id="referido_por" value="<%= ref %>">
         <!-- Nombre y Apellido en una fila -->
         <div class="form-row">
             <div class="form-group">
