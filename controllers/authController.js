@@ -6,7 +6,7 @@ class AuthController {
      */
     static async register(req, res) {
         try {
-            const { username, email, password, nombre, apellido } = req.body;
+            const { username, email, password, nombre, apellido, referido_por } = req.body;
 
             // Validaciones básicas
             if (!username || !email || !password || !nombre || !apellido) {
@@ -58,7 +58,8 @@ class AuthController {
                 password,
                 nombre,
                 apellido,
-                tipo_usuario: 'cliente' // Forzado en el servidor, registro exclusivo para clientes
+                tipo_usuario: 'cliente', // Forzado en el servidor, registro exclusivo para clientes
+                referido_por: referido_por || null
             });
 
             // Obtener el usuario completo para iniciar sesión automáticamente

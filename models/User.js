@@ -7,13 +7,13 @@ class User {
      * @param {Object} userData - Datos del usuario a registrar
      * @returns {Promise<Object>} - El ID del usuario insertado
      */
-    static async create({ username, email, password, nombre, apellido, tipo_usuario = 'cliente' }) {
+    static async create({ username, email, password, nombre, apellido, tipo_usuario = 'cliente', referido_por = null }) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const sql = `
-            INSERT INTO usuarios (username, email, password, nombre, apellido, tipo_usuario)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO usuarios (username, email, password, nombre, apellido, tipo_usuario, referido_por)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
         const params = [
             username.trim().toLowerCase(),
@@ -21,11 +21,23 @@ class User {
             hashedPassword,
             nombre.trim(),
             apellido.trim(),
-            tipo_usuario
+            tipo_usuario,
+            referido_por ? referido_por.trim().toLowerCase() : null
         ];
 
         const result = await dbRun(sql, params);
         return { id: result.id };
+    }
+
+    /**
+     * Obtener el número de amigos referidos por un usuario
+     * @param {string} username 
+     * @returns {Promise<number>}
+     */
+    static async getReferredCount(username) {
+        const sql = 'SELECT COUNT(*) as count FROM usuarios WHERE referido_por = ?';
+        const row = await dbGet(sql, [username.trim().toLowerCase()]);
+        return row ? row.count : 0;
     }
 
     /**

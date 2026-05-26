@@ -1,5 +1,5 @@
 /**
- * CineFlix - Funcionalidad del Cliente
+ * NetPolix - Funcionalidad del Cliente
  * Control de formularios AJAX, validación y notificaciones Toast
  */
 
@@ -27,6 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar Reproductor (Solo si existe el modal en el DOM)
     if (document.getElementById('player-modal')) {
         initPlayer();
+    }
+
+    // Inicializar Sistema de Referidos (Solo si existe el modal en el DOM)
+    if (document.getElementById('referral-modal')) {
+        initReferrals();
     }
 
     // Capturar clics de "Agregar al carrito" vía delegación de eventos
@@ -188,6 +193,7 @@ async function handleRegister(e) {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
+    const referido_por = document.getElementById('referido_por') ? document.getElementById('referido_por').value.trim() : '';
 
     // Validaciones del lado del cliente
     if (!nombre || !apellido || !username || !email || !password || !confirmPassword) {
@@ -214,7 +220,7 @@ async function handleRegister(e) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ nombre, apellido, username, email, password })
+            body: JSON.stringify({ nombre, apellido, username, email, password, referido_por })
         });
 
         const data = await response.json();
@@ -276,7 +282,7 @@ spinnerStyle.innerText = `
 document.head.appendChild(spinnerStyle);
 
 /* ==========================================================================
-   CineFlix - Funcionalidad de Carrito de Compras y Alquileres
+   NetPolix - Funcionalidad de Carrito de Compras y Alquileres
    ========================================================================== */
 
 let cart = [];
@@ -287,7 +293,7 @@ let cart = [];
 function initCart() {
     // Cargar del localStorage
     try {
-        const storedCart = localStorage.getItem('cart-cineflix');
+        const storedCart = localStorage.getItem('cart-netpolix');
         cart = storedCart ? JSON.parse(storedCart) : [];
     } catch (e) {
         cart = [];
@@ -366,7 +372,7 @@ function addToCart(movie) {
  * Guardar carrito en LocalStorage
  */
 function saveCart() {
-    localStorage.setItem('cart-cineflix', JSON.stringify(cart));
+    localStorage.setItem('cart-netpolix', JSON.stringify(cart));
 }
 
 /**
@@ -661,6 +667,79 @@ function startSimulatedPlayer() {
                 newPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
                 if (waves) waves.style.display = 'flex';
             }
+        });
+    }
+}
+
+/**
+ * Inicializar Sistema de Referidos de Clientes
+ */
+function initReferrals() {
+    const btnReferral = document.getElementById('btn-referral');
+    const modal = document.getElementById('referral-modal');
+    const closeBtn = document.getElementById('referral-close');
+    const copyBtn = document.getElementById('btn-copy-referral');
+    const input = document.getElementById('referral-link-input');
+
+    if (!btnReferral || !modal) return;
+
+    // Abrir Modal y generar enlace dinámico
+    btnReferral.addEventListener('click', () => {
+        const username = btnReferral.getAttribute('data-username');
+        const origin = window.location.origin;
+        const referralLink = `${origin}/register?ref=${username}`;
+        
+        if (input) {
+            input.value = referralLink;
+        }
+        
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden'; // Evitar scroll de fondo
+    });
+
+    // Cerrar Modal
+    const closeModal = () => {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    // Cerrar haciendo clic fuera
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Cerrar con Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('open')) {
+            closeModal();
+        }
+    });
+
+    // Copiar Enlace
+    if (copyBtn && input) {
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(input.value)
+                .then(() => {
+                    // Feedback visual temporizado al botón de copiar
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Copiado!';
+                    copyBtn.style.background = 'var(--text-success)';
+                    
+                    showToast('¡Enlace Copiado!', 'El enlace de referido se copió al portapapeles con éxito.', 'success');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                        copyBtn.style.background = '';
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Error al copiar:', err);
+                    showToast('Error al Copiar', 'No se pudo copiar el enlace automáticamente.', 'error');
+                });
         });
     }
 }

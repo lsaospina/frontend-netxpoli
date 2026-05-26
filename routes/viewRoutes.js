@@ -4,6 +4,7 @@ const Movie = require('../models/Movie');
 const Rental = require('../models/Rental');
 const Report = require('../models/Report');
 const Rating = require('../models/Rating');
+const User = require('../models/User');
 
 
 // Middleware para verificar si el usuario ha iniciado sesión
@@ -32,20 +33,34 @@ router.get('/', (req, res) => {
 
 // Vista de Login
 router.get('/login', redirectIfLoggedIn, (req, res) => {
-    res.render('login', { title: 'Iniciar Sesión - CineFlix' });
+    res.render('login', { title: 'Iniciar Sesión - NetPolix' });
 });
 
 // Vista de Registro
 router.get('/register', redirectIfLoggedIn, (req, res) => {
-    res.render('register', { title: 'Registrarse - CineFlix' });
+    const ref = req.query.ref || '';
+    res.render('register', { 
+        title: 'Registrarse - NetPolix',
+        ref: ref 
+    });
 });
 
 // Vista de Dashboard (protegida)
-router.get('/dashboard', requireLogin, (req, res) => {
-    res.render('dashboard', { 
-        title: 'Panel de Control - CineFlix',
-        user: req.session.user 
-    });
+router.get('/dashboard', requireLogin, async (req, res) => {
+    try {
+        let referredCount = 0;
+        if (req.session.user && req.session.user.tipo_usuario === 'cliente') {
+            referredCount = await User.getReferredCount(req.session.user.username);
+        }
+        res.render('dashboard', { 
+            title: 'Panel de Control - NetPolix',
+            user: req.session.user,
+            referredCount: referredCount
+        });
+    } catch (error) {
+        console.error('Error al cargar panel de control:', error);
+        res.status(500).send('Error interno del servidor');
+    }
 });
 
 // Vista de Catálogo (protegida)
@@ -61,7 +76,7 @@ router.get('/catalog', requireLogin, async (req, res) => {
         }
         
         res.render('catalog', {
-            title: 'Catálogo de Películas - CineFlix',
+            title: 'Catálogo de Películas - NetPolix',
             user: req.session.user,
             movies: movies,
             genres: genres,
@@ -78,7 +93,7 @@ router.get('/rentals', requireLogin, async (req, res) => {
     try {
         const rentals = await Rental.getActiveByUser(req.session.user.id);
         res.render('rentals', {
-            title: 'Mis Alquileres - CineFlix',
+            title: 'Mis Alquileres - NetPolix',
             user: req.session.user,
             rentals: rentals
         });
@@ -106,7 +121,7 @@ router.get('/reports', requireManager, async (req, res) => {
             Report.getRentalsByGenre()
         ]);
         res.render('reports', {
-            title: 'Reportes - CineFlix',
+            title: 'Reportes - NetPolix',
             user: req.session.user,
             topMovies,
             bestRatedMovies,

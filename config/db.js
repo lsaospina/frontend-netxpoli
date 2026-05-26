@@ -51,10 +51,21 @@ const initDb = async () => {
                 nombre TEXT NOT NULL,
                 apellido TEXT NOT NULL,
                 tipo_usuario TEXT NOT NULL, -- 'cliente', 'gerente', 'administrador'
+                referido_por TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         `);
         console.log('Tabla "usuarios" verificada/creada.');
+
+        // Migración de esquema: Agregar referido_por si la tabla ya existía
+        try {
+            await dbRun('ALTER TABLE usuarios ADD COLUMN referido_por TEXT');
+            console.log('Columna "referido_por" agregada de forma segura a "usuarios".');
+        } catch (err) {
+            if (!err.message.includes('duplicate column name') && !err.message.includes('already exists')) {
+                console.log('Mensaje durante verificación de columna "referido_por":', err.message);
+            }
+        }
 
         // Crear la tabla de películas
         await dbRun(`
